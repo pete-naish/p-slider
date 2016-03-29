@@ -1,0 +1,10 @@
+header {
+    height: 40px;
+    background-color: #fff;
+    position: fixed;
+    width: 100%;
+    bottom: 100%;
+    transition: all 1s linear;
+    transform: translateY(100%);
+    z-index: 1;
+}

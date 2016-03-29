@@ -1,0 +1,39 @@
+// #HELPERS
+
+// A selection of abstracted helper classes. Only use these if there is not already a class on the element you wish to target.
+
+
+// Float rules. There is no `.float` class.
+
+.float-none {
+    float: none !important;
+}
+
+.float-right {
+    float: right !important;
+}
+
+.float-left {
+    float: left !important;
+}
+
+.hide-text {
+    @include hide-text();
+}
+
+.no-wrap {
+    overflow: hidden;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@include bp(medium) {
+    .desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: block !important;
+    }
+}

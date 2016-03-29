@@ -1,0 +1,27 @@
+.p-slider {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.p-slider__slide--pinned {
+    margin: 0;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    background: red;
+}
+
+.p-slider__slide--wipe {
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translateY(100%);
+    width: 100%;
+    background: green;
+    & + & {
+        background: blue;
+    }
+}
