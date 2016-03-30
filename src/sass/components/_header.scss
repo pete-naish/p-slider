@@ -1,4 +1,5 @@
 header {
+    display: none;
     height: 40px;
     background-color: #fff;
     position: fixed;
@@ -6,5 +7,5 @@ header {
     bottom: 100%;
     transition: all 1s linear;
     transform: translateY(100%);
-    z-index: 1;
+    z-index: 4;
 }

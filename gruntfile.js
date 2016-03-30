@@ -2,8 +2,8 @@
 
 module.exports = function (grunt) {
 
-    require('jit-grunt')(grunt);
     require('time-grunt')(grunt);
+    require('load-grunt-config')(grunt);
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -29,6 +29,14 @@ module.exports = function (grunt) {
             }
         },
 
+        notify: {
+            sass: {
+                options: {
+                    message: '<%= pkg.name %> build finished successfully.'
+                }
+            }
+        },
+
         postcss: {
             options: {
                 map: false,
@@ -47,7 +55,7 @@ module.exports = function (grunt) {
         watch: {
             styles: {
                 files: ['<%= src %>/sass/*.scss', '<%= src %>/sass/**/*.scss'],
-                tasks: ['sass', 'postcss']
+                tasks: ['sass', 'postcss', 'notify']
             },
             livereload: {
                 files: ['<%= dest %>/css/app.css'],
