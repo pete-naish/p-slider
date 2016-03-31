@@ -12,7 +12,7 @@ var pSlider = (function(window, undefined) {
     };
 
     var state = {
-        currentSlide: null
+        currentSlide: {}
     }
 
     function init() {
@@ -33,8 +33,7 @@ var pSlider = (function(window, undefined) {
 
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
-        $(ui.slides[0]).addClass('is-active');
-
+        updateActiveSlide(ui.slides[0]);
         // console.log('ui', ui);
     }
 
@@ -46,7 +45,6 @@ var pSlider = (function(window, undefined) {
         });
 
         controller.scrollTo(function(pos) {
-            console.log(pos);
             TweenMax.to(window, 5, {
                 scrollTo: {
                     y: pos,
@@ -63,7 +61,9 @@ var pSlider = (function(window, undefined) {
         wipeAnimation = new TimelineMax();
 
         $.each(ui.slides, function(i, slide) {
-            wipeAnimation.add(TweenMax.fromTo(slide, '10', {y: '0'}, {
+            wipeAnimation.add(TweenMax.to(slide, 2000, {y: '0'}));
+
+            wipeAnimation.add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                 y: '-100%',
                 onStart: function() {
                     updateActiveSlide(slide);
@@ -89,14 +89,15 @@ var pSlider = (function(window, undefined) {
 
     function bindEvents() {
         scene.on('progress', function (event) {
-            // console.log(event);
+            console.log(event.state);
             var progress = event.progress.toFixed(2);
             var direction = controller.info('scrollDirection');
             var slide1 = progress > 0.15 && progress < 0.33;
             var slide2 = progress > 0.48 && progress < 0.66;
             // var slide3 = progress > 0.63 && progress < 0.66;
-            console.log(progress);
-            console.log(event.scrollDirection);
+            // console.log(progress);
+            // console.log(event.scrollDirection);
+            // console.log('scrollPos', controller.info('scrollPos'));
 
             if (direction === 'FORWARD') {
                 if (slide1) { // first slide
@@ -124,10 +125,16 @@ var pSlider = (function(window, undefined) {
                 scrollTop: target.offset().top
             }, 2000);
         });
+
+        // state.currentSlide.on('updateActiveSlide', function() {
+        //     console.log('updated');
+        // });
     }
 
     function updateActiveSlide(slide) {
         state.currentSlide = slide;
+
+        $(state.currentSlide).trigger('updateActiveSlide');
 
         slides.removeClass('is-active');
         $(slide).addClass('is-active');
