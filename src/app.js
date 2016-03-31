@@ -20,7 +20,7 @@ var pSlider = (function(window, undefined) {
         initController();
         initAnimation();
         initScene();
-        bindEvents();
+        // bindEvents();
     }
 
     function initUI() {
@@ -76,15 +76,23 @@ var pSlider = (function(window, undefined) {
     }
 
     function initScene() {
-        scene = new ScrollMagic.Scene({
-            triggerElement: ui.el,
-            duration: '100%'
-        })
-        .setTween(wipeAnimation)
-        .setPin(ui.el, {
-            pushFollowers: false
-        })
-        .addTo(controller);
+        // scene = new ScrollMagic.Scene({
+        //     triggerElement: ui.el,
+        //     duration: '100%'
+        // })
+        // .setTween(wipeAnimation)
+        // .setPin(ui.el, {
+        //     pushFollowers: false
+        // })
+        // .addTo(controller);
+
+        $.each(ui.slides, function(i, slide) {
+            new ScrollMagic.Scene({
+               triggerElement: slide 
+            })
+            .setPin(slide)
+            .addTo(controller);
+        });
     }
 
     function bindEvents() {
