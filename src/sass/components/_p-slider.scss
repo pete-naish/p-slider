@@ -9,11 +9,6 @@
     height: 100%;
     overflow: hidden;
     position: absolute;
-
-    margin-bottom: 600px;
-}
-
-.p-slider__slide {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: bottom center;
@@ -44,4 +39,12 @@
     display: block;
     text-align: center;
     padding: 20px;
+}
+
+.p-slider__controls {
+    position: absolute;
+    height: 100%;
+    width: 20px;
+    right: 0;
+    z-index: 4;
 }
