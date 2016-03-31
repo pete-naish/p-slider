@@ -7,6 +7,7 @@ var pSlider = (function(window, undefined) {
 
     var ui = {
         el: '.p-slider',
+        skipSlides: null,
         slides: []
     };
 
@@ -29,6 +30,8 @@ var pSlider = (function(window, undefined) {
             ui.slides[i] = slide;
             $(slide).attr('id', 'slide' + i);
         });
+
+        ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
         $(ui.slides[0]).addClass('is-active');
 
@@ -75,15 +78,18 @@ var pSlider = (function(window, undefined) {
     function initScene() {
         scene = new ScrollMagic.Scene({
             triggerElement: ui.el,
-            duration: '300%'
+            duration: '100%'
         })
         .setTween(wipeAnimation)
-        .setPin(ui.el)
+        .setPin(ui.el, {
+            pushFollowers: false
+        })
         .addTo(controller);
     }
 
     function bindEvents() {
-        scene.on("progress", function (event) {
+        scene.on('progress', function (event) {
+            // console.log(event);
             var progress = event.progress.toFixed(2);
             var direction = controller.info('scrollDirection');
             var slide1 = progress > 0.15 && progress < 0.33;
@@ -95,14 +101,28 @@ var pSlider = (function(window, undefined) {
             if (direction === 'FORWARD') {
                 if (slide1) { // first slide
                     // controller.scrollTo('#' + ui.slides[1].id);
-                    scene.progress(0.33);
+                    // scene.progress(0.33);
                 } else if (slide2) {
-                    controller.scrollTo('#' + ui.slides[2].id);
+                    // controller.scrollTo('#' + ui.slides[2].id);
                 }
             } else if (direction === 'REVERSE') {
                 
             }
 
+        });
+
+        scene.on('end', function(event) {
+            endSlider();
+        });
+
+        ui.skipSlides.on('click.skipSlides', function(e) {
+            var target = $($(this).attr('href'));
+
+            e.preventDefault();
+
+            $('html, body').animate({
+                scrollTop: target.offset().top
+            }, 2000);
         });
     }
 
@@ -113,10 +133,16 @@ var pSlider = (function(window, undefined) {
         $(slide).addClass('is-active');
     }
 
+    function endSlider() {
+        state.currentSlide = null;
+
+        slides.removeClass('is-active');
+        TweenMax.to(ui.skipSlides, '.5', {bottom: - ui.skipSlides.outerHeight()});
+    }
+
     return {
         init: init
     }
-
 })(window);
 
 pSlider.init();
