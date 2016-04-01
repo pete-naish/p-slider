@@ -1,19 +1,20 @@
 var pSlider = (function(window, undefined) {
-    var controller,
-        wipeAnimation,
-        scene;
+    var controller;
+    var wipeAnimation;
+    var scene;
 
     var ui = {
         el: '.p-slider',
         skipSlides: null,
         slides: null,
-        sliderControls: null,
-        slideAnchors: null
+        slideCount: 0,
+        sliderNav: null,
+        slideButtons: null
     };
 
     var state = {
-        currentSlide: null
-    }
+        currentSlide: null,
+    };
 
     function init() {
         initUI();
@@ -25,22 +26,31 @@ var pSlider = (function(window, undefined) {
 
     function initUI() {
         ui.slides = $(ui.el).find('.p-slider__slide');
+        ui.slideCount = ui.slides.length;
+        ui.sliderNav = $(ui.el).find('.p-slider-nav');
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
-        ui.sliderControls = $(ui.el).find('.p-slider__controls');
 
+        setZindexes();
         buildSlideAnchors();
-
         updateActiveSlide(ui.slides[0]);
+    }
+
+    function setZindexes() {
+        $.each(ui.slides, function(i, slide) {
+            $(slide).css('z-index', ui.slideCount - i);
+        });
+
+        $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
     }
 
     function buildSlideAnchors() {
         $.each(ui.slides, function(i) {
-            var listItem = $('<li class="p-slider__dot"><button class="p-slider__dot-button">' + i + '</button></li>');
+            var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
 
-            ui.sliderControls.append(listItem);
+            ui.sliderNav.append(listItem);
         });
 
-        ui.slideAnchors = $(ui.sliderControls).find('.p-slider__dot');
+        ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
     }
 
     function initController() {
@@ -64,17 +74,17 @@ var pSlider = (function(window, undefined) {
         wipeAnimation = new TimelineMax();
 
         $.each(ui.slides, function(i, slide) {
-            wipeAnimation.add(TweenMax.to(slide, 2000, {y: '0'}));
-
-            wipeAnimation.add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
-                y: '-100%',
-                onStart: function() {
-                    updateActiveSlide(slide);
-                },
-                onReverseComplete: function() {
-                    updateActiveSlide(slide);
-                }
-            }));
+            wipeAnimation
+                .add(TweenMax.to(slide, 2000, {y: '0'}))
+                .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
+                    y: '-100%',
+                    onStart: function() {
+                        updateActiveSlide(slide);
+                    },
+                    onReverseComplete: function() {
+                        updateActiveSlide(slide);
+                    }
+                }));
         });
     }
 
@@ -101,11 +111,11 @@ var pSlider = (function(window, undefined) {
 
             if (direction === 'FORWARD') {
                 if (slide1) { // first slide
-                    newPos = ($(window).height() / ui.slides.length) * 1;
+                    newPos = ($(window).height() / ui.slideCount) * 1;
                     controller.scrollTo(newPos);
                     // scene.progress(0.33);
                 } else if (slide2) {
-                    newPos = ($(window).height() / ui.slides.length) * 2;
+                    newPos = ($(window).height() / ui.slideCount) * 2;
                     controller.scrollTo(newPos);
                     // controller.scrollTo('#' + ui.slides[2].id);
                 }
@@ -129,9 +139,9 @@ var pSlider = (function(window, undefined) {
             }, 2000);
         });
 
-        ui.slideAnchors.on('click.navigateToSlide', function(e) {
+        ui.slideButtons.on('click.navigateToSlide', '.p-slider-nav__button', function(e) {
             var slideNum = $(this).text();
-            var newPos = ($(window).height() / ui.slides.length) * slideNum;            
+            var newPos = ($(window).height() / ui.slideCount) * slideNum;            
 
             e.preventDefault();
             controller.scrollTo(newPos);
@@ -143,14 +153,14 @@ var pSlider = (function(window, undefined) {
 
         state.currentSlide = slide;
 
-        $(ui.slides).add(ui.slideAnchors).removeClass('is-active');
-        $(state.currentSlide).add(ui.slideAnchors[slideIndex]).addClass('is-active');
+        $(ui.slides).add(ui.slideButtons).removeClass('is-active');
+        $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
     }
 
     function endSlider() {
         state.currentSlide = null;
 
-        $(ui.slides).add(ui.slideAnchors).removeClass('is-active');
+        $(ui.slides).add(ui.slideButtons).removeClass('is-active');
 
         TweenMax.to(ui.skipSlides, '.5', {bottom: - ui.skipSlides.outerHeight()});
     }

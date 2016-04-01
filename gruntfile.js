@@ -55,7 +55,10 @@ module.exports = function (grunt) {
         watch: {
             styles: {
                 files: ['<%= src %>/sass/*.scss', '<%= src %>/sass/**/*.scss'],
-                tasks: ['sass', 'postcss', 'notify']
+                tasks: ['sass', 'postcss', 'notify'],
+                options: {
+                    spawn: false // this fixes the issue of having to save twice before livereload works
+                }
             },
             livereload: {
                 files: ['<%= dest %>/css/app.css'],
