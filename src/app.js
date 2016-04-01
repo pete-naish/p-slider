@@ -9,11 +9,13 @@ var pSlider = (function(window, undefined) {
         slides: null,
         slideCount: 0,
         sliderNav: null,
-        slideButtons: null
+        slideButtons: null,
+        videoCount: 0
     };
 
     var state = {
         currentSlide: null,
+        playableVideos: 0
     };
 
     function init() {
@@ -31,7 +33,8 @@ var pSlider = (function(window, undefined) {
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
         setZindexes();
-        initVideos();
+        // initVideos();
+        initLocalVideos();
         buildSlideAnchors();
         updateActiveSlide(ui.slides[0]);
     }
@@ -74,6 +77,48 @@ var pSlider = (function(window, undefined) {
         });        
     }
 
+    function initLocalVideos() {
+        $.each(ui.slides, function(i, slide) {
+            var videoUri = $(slide).data('video');
+            var poster = $(slide).data('poster');
+
+            if (videoUri) {
+                ui.videoCount++;
+
+                $(slide).vide({
+                    mp4: videoUri,
+                    webm: '',
+                    ogv: '',
+                    poster: poster
+                }, {
+                    posterType: 'jpg',
+                      loop: false,
+                      autoplay: false,
+                      className: 'p-slider__video' // Add custom CSS class to Vide div
+                });
+
+                slide.video = $(slide).data('vide').getVideoObject();
+
+                bindVideoEvents(slide.video);
+
+            } else if (poster) {
+                $(slide).css('background-image', 'url(' + poster + ')');
+            }
+        });
+    }
+
+    function bindVideoEvents(video) {
+        $(video).on('canplay', function(e) {
+            state.playableVideos++;
+
+            if (state.playableVideos === ui.videoCount) { // if all videos have loaded 
+                $('body').removeClass('p-slider-loading');
+                $(video).parent().addClass('has-loaded');
+            }
+        });
+
+    }
+
     function buildSlideAnchors() {
         $.each(ui.slides, function(i) {
             var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
@@ -111,6 +156,9 @@ var pSlider = (function(window, undefined) {
                     y: '-100%',
                     onStart: function() {
                         updateActiveSlide(slide);
+                    },
+                    onComplete: function() {
+                        console.log('slide complete', i);
                     },
                     onReverseComplete: function() {
                         updateActiveSlide(slide);
@@ -203,6 +251,12 @@ var pSlider = (function(window, undefined) {
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
         $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
+
+        if (state.playableVideos === ui.videoCount && slide.video) {
+            // slide.video.currentTime = 0;
+            console.log(slide.video.currentTime);
+            slide.video.play();
+        }
     }
 
     function endSlider() {
