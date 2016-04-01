@@ -12,6 +12,7 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: bottom center;
+    background-color: transparent;
 }
 
 .p-slider__content {
@@ -65,5 +66,16 @@
         text-align: center;
         color: #fff;
         -webkit-font-smoothing: antialiased;
+    }
+}
+
+.ytplayer-container {
+    transition: opacity .5s ease-in;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    .loaded & {
+        opacity: 1;
     }
 }

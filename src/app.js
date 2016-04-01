@@ -31,6 +31,7 @@ var pSlider = (function(window, undefined) {
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
         setZindexes();
+        initVideos();
         buildSlideAnchors();
         updateActiveSlide(ui.slides[0]);
     }
@@ -41,6 +42,36 @@ var pSlider = (function(window, undefined) {
         });
 
         $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
+    }
+
+    function initVideos() {
+        $.each(ui.slides, function(i, slide) {
+            var videoId = $(slide).data('video');
+
+            if (videoId) {
+                $(slide).YTPlayer({
+                    videoId: videoId,
+                    // pauseOnScroll: true,
+                    // repeat: false,
+                    playerVars: {
+                        modestBranding: 1,
+                        rel: 0
+                    },
+                    callback: function() {
+                        slide.player = $(slide).data('ytPlayer').player;
+
+                        slide.player.addEventListener('onStateChange', function(event) {
+                            console.log("Player State Change", event);
+                            if (!event.data) {
+                                // var currentIndex = $(state.currentSlide).index();
+                                // var newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
+                                // controller.scrollTo(newPos);
+                            }
+                        });
+                    }
+                });
+            }
+        });        
     }
 
     function buildSlideAnchors() {
@@ -101,38 +132,52 @@ var pSlider = (function(window, undefined) {
     }
 
     function bindEvents() {
-        scene.on('progress', function (event) {
-            var progress = event.progress.toFixed(2);
+        // scene.on('progress.SnapScroll', function (event) {
+        //     var progress = event.progress.toFixed(2);
+        //     var direction = controller.info('scrollDirection');
+        //     var slide1 = progress > 0.15 && progress < 0.33;
+        //     var slide2 = progress > 0.48 && progress < 0.66;
+        //     var newPos;
+
+        //     if (direction === 'FORWARD') {
+        //         if (slide1) { // first slide
+        //             newPos = ($(window).height() / ui.slideCount) * 1;
+        //             controller.scrollTo(newPos);
+        //         } else if (slide2) {
+        //             newPos = ($(window).height() / ui.slideCount) * 2;
+        //             controller.scrollTo(newPos);
+        //         }
+        //     } else if (direction === 'REVERSE') {
+                
+        //     }
+        // });
+
+        // scene.on('progress.enableSnapScroll', function() {
+        //     scene.on('progress.SnapScroll'); 
+        // });
+
+        scene.on('progress.SnapScroll', function() {
             var direction = controller.info('scrollDirection');
-            var slide1 = progress > 0.15 && progress < 0.33;
-            var slide2 = progress > 0.48 && progress < 0.66;
+            var currentIndex = $(state.currentSlide).index();
             var newPos;
-            // var slide3 = progress > 0.63 && progress < 0.66;
 
             if (direction === 'FORWARD') {
-                if (slide1) { // first slide
-                    newPos = ($(window).height() / ui.slideCount) * 1;
-                    controller.scrollTo(newPos);
-                    // scene.progress(0.33);
-                } else if (slide2) {
-                    newPos = ($(window).height() / ui.slideCount) * 2;
-                    controller.scrollTo(newPos);
-                    // controller.scrollTo('#' + ui.slides[2].id);
-                }
+                // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
+                // controller.scrollTo(newPos);
             } else if (direction === 'REVERSE') {
-                
+                // newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
+                // controller.scrollTo(newPos);
             }
-
         });
 
-        scene.on('end', function(event) {
-            endSlider();
-        });
+        scene.on('end', endSlider);
 
         ui.skipSlides.on('click.skipSlides', function(e) {
             var target = $($(this).attr('href'));
 
             e.preventDefault();
+
+            scene.off('progress.SnapScroll');
 
             $('html, body').animate({
                 scrollTop: target.offset().top
@@ -141,17 +186,20 @@ var pSlider = (function(window, undefined) {
 
         ui.slideButtons.on('click.navigateToSlide', '.p-slider-nav__button', function(e) {
             var slideNum = $(this).text();
-            var newPos = ($(window).height() / ui.slideCount) * slideNum;            
+            var newPos = ($(window).height() / ui.slideCount) * slideNum;
 
             e.preventDefault();
+
+            scene.off('progress.SnapScroll');
             controller.scrollTo(newPos);
         });
     }
 
     function updateActiveSlide(slide) {
-        var slideIndex = $(slide).index();
+        var slideIndex;
 
         state.currentSlide = slide;
+        slideIndex = $(state.currentSlide).index();
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
         $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
