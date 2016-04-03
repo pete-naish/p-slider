@@ -1,4 +1,4 @@
-var pSlider = (function(window, undefined) {
+var pSlider = (function(window, $, undefined) {
     var controller;
     var wipeAnimation;
     var scene;
@@ -100,10 +100,19 @@ var pSlider = (function(window, undefined) {
     }
 
     function bindVideoEvents(video) {
-        $(video).on('canplay', function(e) {
+        $(video).on('canplaythrough', function(e) {
+            var videoSlide = $(video).parents('.p-slider__slide');
+            var playFirstSlide = videoSlide.index() === 0 && videoSlide.hasClass('is-active');
+
             video.hasLoaded = true;
 
             $(video).parent().addClass('has-loaded');
+
+            if (playFirstSlide) {
+                video.play();
+            }
+
+            $(video).off('canplaythrough'); // unbind this after first run, as restarting video causes the canplaythrough event to be fired every time
         })
         .on('error', function(e) {
             console.log('error');
@@ -151,7 +160,11 @@ var pSlider = (function(window, undefined) {
                 .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                     y: '-100%',
                     onComplete: function() {
-                        updateActiveSlide(ui.slides[i + 1]); // activate next slide
+                        // $(slide).addClass('has-finished');
+
+                        if (i < ui.slideCount - 1) { // don't run on last slide
+                            updateActiveSlide(ui.slides[i + 1]); // activate next slide
+                        }
                     },
                     onReverseComplete: function() {
                         updateActiveSlide(slide);
@@ -208,11 +221,11 @@ var pSlider = (function(window, undefined) {
         var newPos;
 
         if (direction === 'FORWARD') {
-            console.log('forward');
+            // console.log('forward');
             // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
             // controller.scrollTo(newPos);
         } else if (direction === 'REVERSE') {
-            console.log('reverse');
+            // console.log('reverse');
             // newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
             // controller.scrollTo(newPos);
         }
@@ -226,10 +239,7 @@ var pSlider = (function(window, undefined) {
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
         $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
 
-        console.log(slide.video && slide.video.hasLoaded);
-
         if (slide.video && slide.video.hasLoaded) {
-            console.log('play video');
             playVideo(slide.video);
         }
     }
@@ -251,6 +261,6 @@ var pSlider = (function(window, undefined) {
         init: init,
         ui: ui
     }
-})(window);
+})(window, jQuery);
 
 pSlider.init();
