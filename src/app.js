@@ -30,19 +30,27 @@ var pSlider = (function(window, $, undefined) {
         ui.sliderNav = $(ui.el).find('.p-slider-nav');
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
-        setZindexes();
-        // initVideos();
-        initLocalVideos();
-        buildSlideButtons();
+        $.each(ui.slides, function(i, slide) {
+            setZindexes(i, slide);
+            buildSlideButtons(i, slide);
+            initLocalVideos(i, slide);
+        });
+
+        ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
+
         updateActiveSlide(ui.slides[0]);
     }
 
-    function setZindexes() {
-        $.each(ui.slides, function(i, slide) {
-            $(slide).css('z-index', ui.slideCount - i);
-        });
+    function setZindexes(i, slide) {
+        $(slide).css('z-index', ui.slideCount - i);
 
         $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
+    }
+
+    function buildSlideButtons(i, slide) {
+        var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
+
+        ui.sliderNav.append(listItem);
     }
 
     function initVideos() {
@@ -75,28 +83,26 @@ var pSlider = (function(window, $, undefined) {
         });        
     }
 
-    function initLocalVideos() {
-        $.each(ui.slides, function(i, slide) {
-            var videoUri = $(slide).data('video');
+    function initLocalVideos(i, slide) {
+        var videoUri = $(slide).data('video');
 
-            if (videoUri) {
-                $(slide).vide({
-                    mp4: videoUri,
-                    webm: '',
-                    ogv: '',
-                    poster: ''
-                }, {
-                    posterType: '',
-                    loop: false,
-                    autoplay: false,
-                    className: 'p-slider__video'
-                });
+        if (videoUri) {
+            $(slide).vide({
+                mp4: videoUri,
+                webm: '',
+                ogv: '',
+                poster: ''
+            }, {
+                posterType: '',
+                loop: false,
+                autoplay: false,
+                className: 'p-slider__video'
+            });
 
-                slide.video = $(slide).data('vide').getVideoObject();
+            slide.video = $(slide).data('vide').getVideoObject();
 
-                bindVideoEvents(slide.video);
-            }
-        });
+            bindVideoEvents(slide.video);
+        }
     }
 
     function bindVideoEvents(video) {
@@ -116,17 +122,6 @@ var pSlider = (function(window, $, undefined) {
             console.log('error');
             video.load();
         });
-
-    }
-
-    function buildSlideButtons() {
-        $.each(ui.slides, function(i) {
-            var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
-
-            ui.sliderNav.append(listItem);
-        });
-
-        ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
     }
 
     function initController() {
@@ -184,7 +179,9 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function bindEvents() {
-        scene.on('progress.SnapScroll', snapScroll).on('end', endSlider);
+        scene
+        .on('progress.SnapScroll', snapScroll)
+        .on('end', endSlider);
 
         ui.skipSlides.on('click.skipSlides', function(e) {
             var target = $($(this).attr('href'));
