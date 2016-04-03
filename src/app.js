@@ -33,7 +33,7 @@ var pSlider = (function(window, $, undefined) {
         setZindexes();
         // initVideos();
         initLocalVideos();
-        buildSlideAnchors();
+        buildSlideButtons();
         updateActiveSlide(ui.slides[0]);
     }
 
@@ -101,18 +101,16 @@ var pSlider = (function(window, $, undefined) {
 
     function bindVideoEvents(video) {
         $(video).on('canplaythrough', function(e) {
-            var videoSlide = $(video).parents('.p-slider__slide');
-            var playFirstSlide = videoSlide.index() === 0 && videoSlide.hasClass('is-active');
+            var slide = $(video).parents('.p-slider__slide');
+            var playFirstSlide = slide.index() === 0 && slide.hasClass('is-active');
 
             video.hasLoaded = true;
-
-            $(video).parent().addClass('has-loaded');
 
             if (playFirstSlide) {
                 video.play();
             }
 
-            $(video).off('canplaythrough'); // unbind this after first run, as restarting video causes the canplaythrough event to be fired every time
+            $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video causes the canplaythrough event to be fired every time
         })
         .on('error', function(e) {
             console.log('error');
@@ -121,7 +119,7 @@ var pSlider = (function(window, $, undefined) {
 
     }
 
-    function buildSlideAnchors() {
+    function buildSlideButtons() {
         $.each(ui.slides, function(i) {
             var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
 
@@ -186,9 +184,7 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function bindEvents() {
-        scene.on('progress.SnapScroll', snapScroll);
-
-        scene.on('end', endSlider);
+        scene.on('progress.SnapScroll', snapScroll).on('end', endSlider);
 
         ui.skipSlides.on('click.skipSlides', function(e) {
             var target = $($(this).attr('href'));
