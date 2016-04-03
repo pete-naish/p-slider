@@ -89,32 +89,29 @@ var pSlider = (function(window, undefined) {
                     mp4: videoUri,
                     webm: '',
                     ogv: '',
-                    poster: poster
+                    poster: ''
                 }, {
-                    posterType: 'jpg',
-                      loop: false,
-                      autoplay: false,
-                      className: 'p-slider__video' // Add custom CSS class to Vide div
+                    posterType: '',
+                    loop: false,
+                    autoplay: false,
+                    className: 'p-slider__video'
                 });
 
                 slide.video = $(slide).data('vide').getVideoObject();
 
                 bindVideoEvents(slide.video);
-
-            } else if (poster) {
-                $(slide).css('background-image', 'url(' + poster + ')');
             }
         });
     }
 
     function bindVideoEvents(video) {
         $(video).on('canplay', function(e) {
-            state.playableVideos++;
+            $(video).parent().addClass('has-loaded');
+            // state.playableVideos++;
 
-            if (state.playableVideos === ui.videoCount) { // if all videos have loaded 
-                $('body').removeClass('p-slider-loading');
-                $(video).parent().addClass('has-loaded');
-            }
+            // if (state.playableVideos === ui.videoCount) { // if all videos have loaded 
+            //     $('body').removeClass('p-slider-loading');
+            // }
         });
 
     }
@@ -141,6 +138,10 @@ var pSlider = (function(window, undefined) {
                 scrollTo: {
                     y: pos,
                     autoKill: true
+                },
+                onComplete: function() {
+                    scene.on('progress.SnapScroll', snapScroll);
+                    console.log('scroll complete');
                 }
             });
         });
@@ -204,19 +205,7 @@ var pSlider = (function(window, undefined) {
         //     scene.on('progress.SnapScroll'); 
         // });
 
-        scene.on('progress.SnapScroll', function() {
-            var direction = controller.info('scrollDirection');
-            var currentIndex = $(state.currentSlide).index();
-            var newPos;
-
-            if (direction === 'FORWARD') {
-                // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
-                // controller.scrollTo(newPos);
-            } else if (direction === 'REVERSE') {
-                // newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
-                // controller.scrollTo(newPos);
-            }
-        });
+        scene.on('progress.SnapScroll', snapScroll);
 
         scene.on('end', endSlider);
 
@@ -229,7 +218,9 @@ var pSlider = (function(window, undefined) {
 
             $('html, body').animate({
                 scrollTop: target.offset().top
-            }, 2000);
+            }, 2000, function() {
+                scene.on('progress.SnapScroll', snapScroll);                
+            });
         });
 
         ui.slideButtons.on('click.navigateToSlide', '.p-slider-nav__button', function(e) {
@@ -241,6 +232,22 @@ var pSlider = (function(window, undefined) {
             scene.off('progress.SnapScroll');
             controller.scrollTo(newPos);
         });
+    }
+
+    function snapScroll() {
+        var direction = controller.info('scrollDirection');
+        var currentIndex = $(state.currentSlide).index();
+        var newPos;
+
+        if (direction === 'FORWARD') {
+            console.log('forward');
+            // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
+            // controller.scrollTo(newPos);
+        } else if (direction === 'REVERSE') {
+            console.log('reverse');
+            // newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
+            // controller.scrollTo(newPos);
+        }
     }
 
     function updateActiveSlide(slide) {
