@@ -9,13 +9,11 @@ var pSlider = (function(window, undefined) {
         slides: null,
         slideCount: 0,
         sliderNav: null,
-        slideButtons: null,
-        videoCount: 0
+        slideButtons: null
     };
 
     var state = {
-        currentSlide: null,
-        playableVideos: 0
+        currentSlide: null
     };
 
     function init() {
@@ -80,11 +78,8 @@ var pSlider = (function(window, undefined) {
     function initLocalVideos() {
         $.each(ui.slides, function(i, slide) {
             var videoUri = $(slide).data('video');
-            var poster = $(slide).data('poster');
 
             if (videoUri) {
-                ui.videoCount++;
-
                 $(slide).vide({
                     mp4: videoUri,
                     webm: '',
@@ -106,12 +101,13 @@ var pSlider = (function(window, undefined) {
 
     function bindVideoEvents(video) {
         $(video).on('canplay', function(e) {
-            $(video).parent().addClass('has-loaded');
-            // state.playableVideos++;
+            video.hasLoaded = true;
 
-            // if (state.playableVideos === ui.videoCount) { // if all videos have loaded 
-            //     $('body').removeClass('p-slider-loading');
-            // }
+            $(video).parent().addClass('has-loaded');
+        })
+        .on('error', function(e) {
+            console.log('error');
+            video.load();
         });
 
     }
@@ -141,7 +137,6 @@ var pSlider = (function(window, undefined) {
                 },
                 onComplete: function() {
                     scene.on('progress.SnapScroll', snapScroll);
-                    console.log('scroll complete');
                 }
             });
         });
@@ -155,11 +150,8 @@ var pSlider = (function(window, undefined) {
                 .add(TweenMax.to(slide, 2000, {y: '0'}))
                 .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                     y: '-100%',
-                    onStart: function() {
-                        updateActiveSlide(slide);
-                    },
                     onComplete: function() {
-                        console.log('slide complete', i);
+                        updateActiveSlide(ui.slides[i + 1]); // activate next slide
                     },
                     onReverseComplete: function() {
                         updateActiveSlide(slide);
@@ -181,30 +173,6 @@ var pSlider = (function(window, undefined) {
     }
 
     function bindEvents() {
-        // scene.on('progress.SnapScroll', function (event) {
-        //     var progress = event.progress.toFixed(2);
-        //     var direction = controller.info('scrollDirection');
-        //     var slide1 = progress > 0.15 && progress < 0.33;
-        //     var slide2 = progress > 0.48 && progress < 0.66;
-        //     var newPos;
-
-        //     if (direction === 'FORWARD') {
-        //         if (slide1) { // first slide
-        //             newPos = ($(window).height() / ui.slideCount) * 1;
-        //             controller.scrollTo(newPos);
-        //         } else if (slide2) {
-        //             newPos = ($(window).height() / ui.slideCount) * 2;
-        //             controller.scrollTo(newPos);
-        //         }
-        //     } else if (direction === 'REVERSE') {
-                
-        //     }
-        // });
-
-        // scene.on('progress.enableSnapScroll', function() {
-        //     scene.on('progress.SnapScroll'); 
-        // });
-
         scene.on('progress.SnapScroll', snapScroll);
 
         scene.on('end', endSlider);
@@ -251,19 +219,24 @@ var pSlider = (function(window, undefined) {
     }
 
     function updateActiveSlide(slide) {
-        var slideIndex;
+        var slideIndex = $(slide).index();
 
         state.currentSlide = slide;
-        slideIndex = $(state.currentSlide).index();
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
         $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
 
-        if (state.playableVideos === ui.videoCount && slide.video) {
-            // slide.video.currentTime = 0;
-            console.log(slide.video.currentTime);
-            slide.video.play();
+        console.log(slide.video && slide.video.hasLoaded);
+
+        if (slide.video && slide.video.hasLoaded) {
+            console.log('play video');
+            playVideo(slide.video);
         }
+    }
+
+    function playVideo(video) {
+        video.currentTime = 0;
+        video.play();
     }
 
     function endSlider() {
