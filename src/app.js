@@ -38,7 +38,9 @@ var pSlider = (function(window, $, undefined) {
 
         ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
 
-        updateActiveSlide(ui.slides[0]);
+        setTimeout(function() {
+            updateActiveSlide(ui.slides[0]);
+        }, 500);
     }
 
     function setZindexes(i, slide) {
@@ -63,7 +65,7 @@ var pSlider = (function(window, $, undefined) {
                 ogv: '',
                 poster: ''
             }, {
-                posterType: '',
+                posterType: 'none',
                 loop: false,
                 autoplay: false,
                 className: 'p-slider__video'
@@ -86,10 +88,12 @@ var pSlider = (function(window, $, undefined) {
                 playVideo(video);
             }
 
-            $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video causes the canplaythrough event to be fired every time
+            $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video (in playVideo func) causes the canplaythrough event to be fired every time the slide is viewed
         })
         .on('error', function(e) {
-            // console.log('error');
+            // console.log(e.code);
+            // console.log(video.error);
+            // $(video).hide();
             video.load();
             video.play();
         });
@@ -124,8 +128,6 @@ var pSlider = (function(window, $, undefined) {
                 .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                     y: '-100%',
                     onComplete: function() {
-                        $(slide).addClass('has-displayed');
-
                         if (i < ui.slideCount - 1) { // don't run on last slide
                             updateActiveSlide(ui.slides[i + 1]); // activate next slide
                         }
@@ -136,15 +138,6 @@ var pSlider = (function(window, $, undefined) {
                 }));
         });
     }
-
-    // function initSlideContentAnimation() {
-    //     var slideText = $(slide).find('.p-slider__title, p-slider__subtitle');
-    //     var slideButton = $(slide).find('.p-slider__button');
-
-    //     .add(TweenMax.fromTo(slideText, 2000, {opacity: 0}, {
-    //         opacity: 1
-    //     }))
-    // }
 
     function initScene() {
         scene = new ScrollMagic.Scene({
@@ -210,7 +203,12 @@ var pSlider = (function(window, $, undefined) {
         state.currentSlide = slide;
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
-        $(state.currentSlide).add(ui.slideButtons[slideIndex]).addClass('is-active');
+        $(state.currentSlide).addClass('has-displayed').add(ui.slideButtons[slideIndex]).addClass('is-active');
+
+        $.each(ui.slides, function(i, slide) { // pause and set each video back to the first frame
+            pauseVideo(slide.video);
+            rewindVideo(slide.video);
+        });
 
         if (slide.video && slide.video.hasLoaded) {
             playVideo(slide.video);
@@ -218,8 +216,15 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function playVideo(video) {
-        video.currentTime = 0;
         video.play();
+    }
+
+    function pauseVideo(video) {
+        video.pause();
+    }
+
+    function rewindVideo(video) {
+        video.currentTime = 0;
     }
 
     function endSlider() {

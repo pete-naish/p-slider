@@ -47,7 +47,7 @@
 }
 
 .p-slider__title {
-    transition: all .3s ease-in;
+    transition: all .3s ease-out;
     font-family: $font-vwhead--bold;
     font-size: 60px;
     color: #fff;
@@ -64,7 +64,7 @@
 }
 
 .p-slider__subtitle {
-    transition: all .3s ease-in;
+    transition: all .3s ease-out;
     font-family: $font-vwhead--bold;
     font-size: 30px;
     color: #fff; 
@@ -81,7 +81,7 @@
 }
 
 .p-slider__button {
-    transition: background-color .2s linear, opacity .3s ease-in .3s;
+    transition: background-color .2s linear, opacity .3s ease-out .3s;
     font-family: $font-vwhead--bold;
     font-size: 14px;
     background-color: #01a8ec;
@@ -117,7 +117,7 @@
 }
 
 .p-slider__cta-item {
-    transition: all .3s ease-in;
+    transition: all .3s ease-out;
     display: inline-block;
     list-style: none;
     margin-bottom: 20px;
@@ -151,6 +151,7 @@
 }
 
 .p-slider__skip-slides {
+    transition: all .2s linear;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -158,10 +159,17 @@
     background: #fff;
     display: block;
     text-align: center;
+    color: #000;
+    text-decoration: none;
     padding: 20px;
     .no-js &,
     .p-slider-loading & {
         display: none;
+    }
+    &:hover {
+        transition: all .1s linear;
+        background-color: #01a8ec;
+        color: #fff;
     }
 }
 
@@ -208,7 +216,6 @@
 
 .p-slider__video {
     > video {
-        transition: opacity .5s ease-in;
         opacity: 0;
     }
     &.has-loaded > video {
