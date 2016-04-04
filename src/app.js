@@ -53,36 +53,6 @@ var pSlider = (function(window, $, undefined) {
         ui.sliderNav.append(listItem);
     }
 
-    function initVideos() {
-        $.each(ui.slides, function(i, slide) {
-            var videoId = $(slide).data('video');
-
-            if (videoId) {
-                $(slide).YTPlayer({
-                    videoId: videoId,
-                    // pauseOnScroll: true,
-                    // repeat: false,
-                    playerVars: {
-                        modestBranding: 1,
-                        rel: 0
-                    },
-                    callback: function() {
-                        slide.player = $(slide).data('ytPlayer').player;
-
-                        slide.player.addEventListener('onStateChange', function(event) {
-                            console.log("Player State Change", event);
-                            if (!event.data) {
-                                // var currentIndex = $(state.currentSlide).index();
-                                // var newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
-                                // controller.scrollTo(newPos);
-                            }
-                        });
-                    }
-                });
-            }
-        });        
-    }
-
     function initLocalVideos(i, slide) {
         var videoUri = $(slide).data('video');
 
@@ -113,14 +83,15 @@ var pSlider = (function(window, $, undefined) {
             video.hasLoaded = true;
 
             if (playFirstSlide) {
-                video.play();
+                playVideo(video);
             }
 
             $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video causes the canplaythrough event to be fired every time
         })
         .on('error', function(e) {
-            console.log('error');
+            // console.log('error');
             video.load();
+            video.play();
         });
     }
 
@@ -153,7 +124,7 @@ var pSlider = (function(window, $, undefined) {
                 .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                     y: '-100%',
                     onComplete: function() {
-                        // $(slide).addClass('has-finished');
+                        $(slide).addClass('has-displayed');
 
                         if (i < ui.slideCount - 1) { // don't run on last slide
                             updateActiveSlide(ui.slides[i + 1]); // activate next slide
@@ -165,6 +136,15 @@ var pSlider = (function(window, $, undefined) {
                 }));
         });
     }
+
+    // function initSlideContentAnimation() {
+    //     var slideText = $(slide).find('.p-slider__title, p-slider__subtitle');
+    //     var slideButton = $(slide).find('.p-slider__button');
+
+    //     .add(TweenMax.fromTo(slideText, 2000, {opacity: 0}, {
+    //         opacity: 1
+    //     }))
+    // }
 
     function initScene() {
         scene = new ScrollMagic.Scene({

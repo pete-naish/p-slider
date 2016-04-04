@@ -1,38 +1,26 @@
 // #TYPE
 
 @font-face {
-    font-family: "VWHeadRegular";
-    src: url("/assets/common/font/VWHeadWeb/VWHeadWeb-Regular.eot");
-    src: url("/assets/common/font/VWHeadWeb/VWHeadWeb-Regular.eot?#iefix") format("embedded-opentype"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Regular.woff") format("woff"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Regular.ttf") format("truetype"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Regular.svg#194f5394ae2e9c74dc3c441b92862d1d") format("svg");
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
     font-family: "VWHeadBold";
-    src: url("/assets/common/font/VWHeadWeb/VWHeadWeb-Bold.eot");
-    src: url("/assets/common/font/VWHeadWeb/VWHeadWeb-Bold.eot?#iefix") format("embedded-opentype"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Bold.woff") format("woff"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Bold.ttf") format("truetype"),
-        url("/assets/common/font/VWHeadWeb/VWHeadWeb-Bold.svg#194f5394ae2e9c74dc3c441b92862d1d") format("svg");
+    src: url("/src/type/VWHeadWeb-Bold.eot");
+    src: url("/src/type/VWHeadWeb-Bold.eot?#iefix") format("embedded-opentype"),
+        url("/src/type/VWHeadWeb-Bold.woff") format("woff"),
+        url("/src/type/VWHeadWeb-Bold.ttf") format("truetype"),
+        url("/src/type/VWHeadWeb-Bold.svg#194f5394ae2e9c74dc3c441b92862d1d") format("svg");
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: "VWTextRegular";
-    src: url("/assets/common/font/VWTextWeb/VWTextWeb-Regular.eot");
-    src: url("/assets/common/font/VWTextWeb/VWTextWeb-Regular.eot?#iefix") format("embedded-opentype"),
-        url("/assets/common/font/VWTextWeb/VWTextWeb-Regular.woff") format("woff"),
-        url("/assets/common/font/VWTextWeb/VWTextWeb-Regular.ttf") format("truetype"),
-        url("/assets/common/font/VWTextWeb/VWTextWeb-Regular.svg#194f5394ae2e9c74dc3c441b92862d1d") format("svg");
+    src: url("/src/type/VWTextWeb-Regular.eot");
+    src: url("/src/type/VWTextWeb-Regular.eot?#iefix") format("embedded-opentype"),
+        url("/src/type/VWTextWeb-Regular.woff") format("woff"),
+        url("/src/type/VWTextWeb-Regular.ttf") format("truetype"),
+        url("/src/type/VWTextWeb-Regular.svg#194f5394ae2e9c74dc3c441b92862d1d") format("svg");
     font-weight: normal;
     font-style: normal;
 }
 
-$font-vwhead--regular: 'VWHeadRegular' Arial, sans-serif;
 $font-vwhead--bold: 'VWHeadBold' Arial, sans-serif;
 $font-vwtext--regular: 'VWTextRegular' Arial, sans-serif;
