@@ -46,7 +46,7 @@ var pSlider = (function(window, $, undefined) {
     function setZindexes(i, slide) {
         $(slide).css('z-index', ui.slideCount - i);
 
-        $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
+        $(ui.sliderNav).add(ui.skipSlides).add('header').css('z-index', ui.slideCount + 1);
     }
 
     function buildSlideButtons(i, slide) {
@@ -123,7 +123,10 @@ var pSlider = (function(window, $, undefined) {
         wipeAnimation = new TimelineMax();
 
         $.each(ui.slides, function(i, slide) {
+            // var wrapper = $(slide).find('.p-slider__content-wrapper');
+
             wipeAnimation
+                // .add(TweenMax.to(wrapper, 500, {backgroundColor: 'rgba(0, 0, 0, .1)'}))
                 .add(TweenMax.to(slide, 2000, {y: '0'}))
                 .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
                     y: '-100%',
@@ -154,6 +157,7 @@ var pSlider = (function(window, $, undefined) {
     function bindEvents() {
         scene
         .on('progress.SnapScroll', snapScroll)
+        .on('progress.addDirectionClass', addDirectionClass)
         .on('end', endSlider);
 
         ui.skipSlides.on('click.skipSlides', function(e) {
@@ -181,10 +185,18 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
+    function addDirectionClass() {
+        var direction = controller.info('scrollDirection');
+
+        $(ui.el).toggleClass('reverse', direction === 'REVERSE');
+    }
+
     function snapScroll() {
         var direction = controller.info('scrollDirection');
         var currentIndex = $(state.currentSlide).index();
         var newPos;
+
+        // console.log('snap!');
 
         if (direction === 'FORWARD') {
             // console.log('forward');

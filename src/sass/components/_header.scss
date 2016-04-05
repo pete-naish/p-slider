@@ -1,11 +1,15 @@
 header {
-    // display: none;
-    height: 40px;
     background-color: #fff;
     position: fixed;
     width: 100%;
     bottom: 100%;
-    transition: all 1s linear;
-    transform: translateY(100%);
-    z-index: 4;
+    transform: translateY(0);
+    animation: slideInFromTop .3s 1 .5s forwards;
+    
+
+    img {
+        max-width: 100%;
+        display: block;
+        margin: 0 auto;
+    }
 }

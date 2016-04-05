@@ -7,9 +7,15 @@ body {
 }
 
 body {
-    background-color: grey;
+    background-color: #fff;
 }
 
 * {
     box-sizing: border-box;
+}
+
+.page-content img {
+    max-width: 100%;
+    display: block;
+    margin: 60px auto 0;
 }
