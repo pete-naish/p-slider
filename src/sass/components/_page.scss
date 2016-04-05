@@ -14,8 +14,12 @@ body {
     box-sizing: border-box;
 }
 
+.page-content {
+    background: url(/src/img/bg-placeholder-content.jpg) repeat-x top center;
+}
+
 .page-content img {
     max-width: 100%;
     display: block;
-    margin: 60px auto 0;
+    margin: 0 auto 0;
 }

@@ -243,8 +243,6 @@ var pSlider = (function(window, $, undefined) {
         state.currentSlide = null;
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
-
-        TweenMax.to(ui.skipSlides, '.5', {bottom: - ui.skipSlides.outerHeight()});
     }
 
     return {
