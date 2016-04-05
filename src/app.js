@@ -50,9 +50,14 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function buildSlideButtons(i, slide) {
-        var listItem = $('<li class="p-slider-nav__item"><button class="p-slider-nav__button">' + i + '</button></li>');
-
-        ui.sliderNav.append(listItem);
+        $('<li>', {
+            class: 'p-slider-nav__item'
+        })
+        .append($('<button>', {
+            class: 'p-slider-nav__button',
+            text: i
+        }))
+        .appendTo(ui.sliderNav);
     }
 
     function initLocalVideos(i, slide) {
