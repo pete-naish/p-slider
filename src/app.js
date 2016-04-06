@@ -1,7 +1,10 @@
 var pSlider = (function(window, $, undefined) {
     var controller;
     var wipeAnimation;
-    var scene;
+    var scene = new ScrollMagic.Scene({
+            triggerElement: '.p-slider',
+            duration: '100%'
+        });
 
     var ui = {
         el: '.p-slider',
@@ -46,7 +49,8 @@ var pSlider = (function(window, $, undefined) {
     function setZindexes(i, slide) {
         $(slide).css('z-index', ui.slideCount - i);
 
-        $(ui.sliderNav).add(ui.skipSlides).add('header').css('z-index', ui.slideCount + 1);
+        $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
+        $('header').css('z-index', ui.slideCount + 2);
     }
 
     function buildSlideButtons(i, slide) {
@@ -148,10 +152,11 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function initScene() {
-        scene = new ScrollMagic.Scene({
-            triggerElement: ui.el,
-            duration: '100%'
-        })
+        // scene = new ScrollMagic.Scene({
+        //     triggerElement: ui.el,
+        //     duration: '100%'
+        // })
+        scene
         .setTween(wipeAnimation)
         .setPin(ui.el, {
             pushFollowers: false
@@ -248,11 +253,14 @@ var pSlider = (function(window, $, undefined) {
         state.currentSlide = null;
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
+
+        // scene.removePin(true);
     }
 
     return {
         init: init,
-        ui: ui
+        ui: ui,
+        scene: scene
     }
 })(window, jQuery);
 
