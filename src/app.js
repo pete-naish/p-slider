@@ -36,7 +36,7 @@ var pSlider = (function(window, $, undefined) {
         $.each(ui.slides, function(i, slide) {
             setZindexes(i, slide);
             buildSlideButtons(i, slide);
-            initLocalVideos(i, slide);
+            initVideos(i, slide);
         });
 
         ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
@@ -64,7 +64,7 @@ var pSlider = (function(window, $, undefined) {
         .appendTo(ui.sliderNav);
     }
 
-    function initLocalVideos(i, slide) {
+    function initVideos(i, slide) {
         var videoUri = $(slide).data('video');
 
         if (videoUri) {
