@@ -13,7 +13,8 @@ var pSlider = (function(window, $, undefined) {
     };
 
     var state = {
-        currentSlide: null
+        currentSlide: null,
+        scrolling: false
     };
 
     function init() {
@@ -116,10 +117,13 @@ var pSlider = (function(window, $, undefined) {
             TweenMax.to(window, 1, {
                 scrollTo: {
                     y: pos,
-                    autoKill: true
+                    autoKill: false
                 },
                 onComplete: function() {
-                    scene.on('progress.SnapScroll', snapScroll);
+                    setTimeout(function() {
+                        scene.on('progress.SnapScroll', snapScroll);
+                        state.scrolling = false;
+                    }, 500);
                 }
             });
         });
@@ -202,15 +206,16 @@ var pSlider = (function(window, $, undefined) {
         var currentIndex = $(state.currentSlide).index();
         var newPos;
 
-        if (direction === 'FORWARD') {
-            // console.log('forward');
-            // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
-            // controller.scrollTo(newPos);
-        } else if (direction === 'REVERSE') {
-            // console.log('reverse');
-            // newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
-            // controller.scrollTo(newPos);
+        if (!state.scrolling && direction === 'FORWARD') {
+            newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
+            controller.scrollTo(newPos);
+            state.scrolling = true;
+        } else if (!state.scrolling && direction === 'REVERSE') {
+            newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
+            controller.scrollTo(newPos);
+            state.scrolling = true;
         }
+        
     }
 
     function updateActiveSlide(slide) {
