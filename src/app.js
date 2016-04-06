@@ -1,10 +1,7 @@
 var pSlider = (function(window, $, undefined) {
     var controller;
     var wipeAnimation;
-    var scene = new ScrollMagic.Scene({
-            triggerElement: '.p-slider',
-            duration: '100%'
-        });
+    var scene; 
 
     var ui = {
         el: '.p-slider',
@@ -152,11 +149,10 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function initScene() {
-        // scene = new ScrollMagic.Scene({
-        //     triggerElement: ui.el,
-        //     duration: '100%'
-        // })
-        scene
+        scene = new ScrollMagic.Scene({
+            triggerElement: ui.el,
+            duration: '100%'
+        })
         .setTween(wipeAnimation)
         .setPin(ui.el, {
             pushFollowers: false
@@ -206,8 +202,6 @@ var pSlider = (function(window, $, undefined) {
         var currentIndex = $(state.currentSlide).index();
         var newPos;
 
-        // console.log('snap!');
-
         if (direction === 'FORWARD') {
             // console.log('forward');
             // newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
@@ -253,8 +247,6 @@ var pSlider = (function(window, $, undefined) {
         state.currentSlide = null;
 
         $(ui.slides).add(ui.slideButtons).removeClass('is-active');
-
-        // scene.removePin(true);
     }
 
     return {
