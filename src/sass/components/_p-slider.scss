@@ -26,7 +26,7 @@
 
 .p-slider__content-wrapper {
     transition: background-color .5s ease-out;
-    background: url(/src/img/bg-gradient.png) repeat-x bottom;
+    background: url(/src/img/bg-gradient.png) repeat-x bottom rgba(0, 0, 0, .1);
     width: 100%;
     height: 100%;
     position: relative;
@@ -253,4 +253,13 @@
     &.has-loaded > video {
         opacity: 1;
     }
+}
+
+.p-slider__overlay {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; // fix this for ie < 11
 }

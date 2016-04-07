@@ -130,7 +130,7 @@ var pSlider = (function(window, $, undefined) {
         wipeAnimation = new TimelineMax();
 
         $.each(ui.slides, function(i, slide) {
-            var wrapper = $(slide).next().find('.p-slider__content-wrapper');
+            var nextSlideOverlay = $(slide).next().find('.p-slider__overlay');
 
             wipeAnimation
                 .add([
@@ -147,7 +147,12 @@ var pSlider = (function(window, $, undefined) {
                             updateActiveSlide(slide);
                         }
                     }),
-                    TweenMax.fromTo(wrapper, 5000, {backgroundColor: 'rgba(0, 0, 0, 1)'}, {backgroundColor: 'rgba(0, 0, 0, .1)', delay: 500})
+                    TweenMax.fromTo(nextSlideOverlay, 5000, {
+                        backgroundColor: 'rgba(0, 0, 0, 1)'
+                    }, {
+                        backgroundColor: 'rgba(0, 0, 0, 0)',
+                        delay: 500
+                    })
                 ])
         });
     }
