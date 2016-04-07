@@ -204,18 +204,15 @@ var pSlider = (function(window, $, undefined) {
     function snapScroll() {
         var direction = controller.info('scrollDirection');
         var currentIndex = $(state.currentSlide).index();
-        var newPos;
+        var next = currentIndex + 1;
+        var prev = currentIndex - 1;
+        var newIndex = direction === 'FORWARD' ? next : prev;
+        var newPos = ($(window).height() / ui.slideCount) * (newIndex);
 
-        if (!state.scrolling && direction === 'FORWARD') {
-            newPos = ($(window).height() / ui.slideCount) * (currentIndex + 1);
-            controller.scrollTo(newPos);
-            state.scrolling = true;
-        } else if (!state.scrolling && direction === 'REVERSE') {
-            newPos = ($(window).height() / ui.slideCount) * (currentIndex - 1);
+        if (!state.scrolling) {
             controller.scrollTo(newPos);
             state.scrolling = true;
         }
-        
     }
 
     function updateActiveSlide(slide) {
