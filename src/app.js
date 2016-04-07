@@ -92,15 +92,12 @@ var pSlider = (function(window, $, undefined) {
             video.hasLoaded = true;
 
             if (playFirstSlide) {
-                playVideo(video);
+                video.play
             }
 
             $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video (in playVideo func) causes the canplaythrough event to be fired every time the slide is viewed
         })
         .on('error', function(e) {
-            // console.log(e.code);
-            // console.log(video.error);
-            // $(video).hide();
             video.load();
             video.play();
         });
@@ -133,22 +130,25 @@ var pSlider = (function(window, $, undefined) {
         wipeAnimation = new TimelineMax();
 
         $.each(ui.slides, function(i, slide) {
-            // var wrapper = $(slide).find('.p-slider__content-wrapper');
+            var wrapper = $(slide).next().find('.p-slider__content-wrapper');
 
             wipeAnimation
-                // .add(TweenMax.to(wrapper, 500, {backgroundColor: 'rgba(0, 0, 0, .1)'}))
-                .add(TweenMax.to(slide, 2000, {y: '0'}))
-                .add(TweenMax.fromTo(slide, 5000, {y: '0'}, {
-                    y: '-100%',
-                    onComplete: function() {
-                        if (i < ui.slideCount - 1) { // don't run on last slide
-                            updateActiveSlide(ui.slides[i + 1]); // activate next slide
+                .add([
+                    TweenMax.fromTo(slide, 5000, {
+                        y: '0'
+                    }, {
+                        y: '-100%',
+                        onComplete: function() {
+                            if (i < ui.slideCount - 1) { // don't run on last slide
+                                updateActiveSlide(ui.slides[i + 1]); // activate next slide
+                            }
+                        },
+                        onReverseComplete: function() {
+                            updateActiveSlide(slide);
                         }
-                    },
-                    onReverseComplete: function() {
-                        updateActiveSlide(slide);
-                    }
-                }));
+                    }),
+                    TweenMax.fromTo(wrapper, 5000, {backgroundColor: 'rgba(0, 0, 0, 1)'}, {backgroundColor: 'rgba(0, 0, 0, .1)', delay: 500})
+                ])
         });
     }
 
@@ -167,7 +167,6 @@ var pSlider = (function(window, $, undefined) {
     function bindEvents() {
         scene
         .on('progress.SnapScroll', snapScroll)
-        .on('progress.addDirectionClass', addDirectionClass)
         .on('end', endSlider);
 
         ui.skipSlides.on('click.skipSlides', function(e) {
@@ -195,12 +194,6 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
-    function addDirectionClass() {
-        var direction = controller.info('scrollDirection');
-
-        $(ui.el).toggleClass('reverse', direction === 'REVERSE');
-    }
-
     function snapScroll() {
         var direction = controller.info('scrollDirection');
         var currentIndex = $(state.currentSlide).index();
@@ -222,25 +215,13 @@ var pSlider = (function(window, $, undefined) {
         $(state.currentSlide).addClass('has-displayed').add(ui.slideButtons[slideIndex]).addClass('is-active');
 
         $.each(ui.slides, function(i, slide) { // pause and set each video back to the first frame
-            pauseVideo(slide.video);
-            rewindVideo(slide.video);
+            slide.video.pause();
+            slide.video.currentTime = 0;
         });
 
         if (slide.video && slide.video.hasLoaded) {
-            playVideo(slide.video);
+            slide.video.play();
         }
-    }
-
-    function playVideo(video) {
-        video.play();
-    }
-
-    function pauseVideo(video) {
-        video.pause();
-    }
-
-    function rewindVideo(video) {
-        video.currentTime = 0;
     }
 
     function endSlider() {
@@ -250,10 +231,9 @@ var pSlider = (function(window, $, undefined) {
     }
 
     return {
-        init: init,
-        ui: ui,
-        scene: scene
+        init: init
     }
+
 })(window, jQuery);
 
 pSlider.init();
