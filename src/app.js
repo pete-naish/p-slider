@@ -40,6 +40,7 @@ var pSlider = (function(window, $, undefined) {
         ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
 
         setTimeout(function() {
+            $(ui.el).removeClass('is-loading');
             updateActiveSlide(ui.slides[0]);
         }, 500);
     }

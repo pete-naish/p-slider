@@ -1,4 +1,4 @@
-.p-slider-loading {
+.is-loading {
     overflow: hidden;
 }
 
@@ -18,7 +18,7 @@
     background-position: center;
     & + & {
         .no-js &,
-        .p-slider-loading & {
+        .is-loading & {
             display: none;
         }
     }
@@ -184,7 +184,7 @@
     text-indent: -9999px;
     font-size: 0;
     .no-js &,
-    .p-slider-loading & {
+    .is-loading & {
         display: none;
     }
 
@@ -201,7 +201,7 @@
     margin: 0;
     padding: 0;
     .no-js &,
-    .p-slider-loading & {
+    .is-loading & {
         display: none;
     }
 }
