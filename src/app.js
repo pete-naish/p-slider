@@ -204,10 +204,8 @@ var pSlider = (function(window, $, undefined) {
     function snapScroll() {
         var direction = controller.info('scrollDirection');
         var currentIndex = $(state.currentSlide).index();
-        var next = currentIndex + 1;
-        var prev = currentIndex - 1;
-        var newIndex = direction === 'FORWARD' ? next : prev;
-        var newPos = ($(window).height() / ui.slideCount) * (newIndex);
+        var newIndex = direction === 'FORWARD' ? currentIndex + 1 : currentIndex - 1;
+        var newPos = ($(window).height() / ui.slideCount) * newIndex;
 
         if (!state.scrolling) {
             controller.scrollTo(newPos);
