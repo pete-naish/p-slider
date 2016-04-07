@@ -1,27 +1,20 @@
 var pSlider = (function(window, $, undefined) {
-    var controller;
-    var wipeAnimation;
-    var scene; 
-
     var ui = {
         el: '.p-slider',
         skipSlides: null,
         slides: null,
         slideCount: 0,
-        sliderNav: null,
-        slideButtons: null
+        sliderNav: null
     };
 
     var state = {
-        currentSlide: null,
-        scrolling: false
-    };
+        currentSlideIndex: null
+    }
 
     function init() {
         initUI();
-        initController();
-        initAnimation();
-        initScene();
+        initPanelSnap();
+        setZindexes();
         bindEvents();
     }
 
@@ -32,22 +25,35 @@ var pSlider = (function(window, $, undefined) {
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
         $.each(ui.slides, function(i, slide) {
-            setZindexes(i, slide);
+            $(slide).attr('data-panel', i);
             buildSlideButtons(i, slide);
             initVideos(i, slide);
         });
-
-        ui.slideButtons = $(ui.sliderNav).find('.p-slider-nav__item');
-
-        setTimeout(function() {
-            $(ui.el).removeClass('is-loading');
-            updateActiveSlide(ui.slides[0]);
-        }, 500);
     }
 
-    function setZindexes(i, slide) {
-        $(slide).css('z-index', ui.slideCount - i);
+    function initPanelSnap() {
+        $('body').panelSnap({
+            panelSelector: '.p-slider__slide',
+            $menu: ui.sliderNav,
+            menuSelector: 'button',
+            navigation: {
+                keys: {
+                    nextKey: 40,
+                    prevKey: 38
+                }
+            },
+            onActivate: function(slide) {
+                var targetSlideIndex = slide.index();
 
+                if (targetSlideIndex !== state.currentSlideIndex) {
+                    updateActiveSlide(ui.slides[targetSlideIndex]);
+                }
+
+            }
+        });
+    }
+
+    function setZindexes() {
         $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
         $('header').css('z-index', ui.slideCount + 2);
     }
@@ -58,7 +64,8 @@ var pSlider = (function(window, $, undefined) {
         })
         .append($('<button>', {
             class: 'p-slider-nav__button',
-            text: i
+            text: i,
+            'data-panel': i
         }))
         .appendTo(ui.sliderNav);
     }
@@ -88,12 +95,12 @@ var pSlider = (function(window, $, undefined) {
     function bindVideoEvents(video) {
         $(video).on('canplaythrough', function(e) {
             var slide = $(video).parents('.p-slider__slide');
-            var playFirstSlide = slide.index() === 0 && slide.hasClass('is-active');
+            var playFirstSlide = slide.index() === 0 && slide.addClass('has-displayed').hasClass('active');
 
             video.hasLoaded = true;
 
             if (playFirstSlide) {
-                video.play
+                video.play();
             }
 
             $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video (in playVideo func) causes the canplaythrough event to be fired every time the slide is viewed
@@ -104,123 +111,25 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
-    function initController() {
-        controller = new ScrollMagic.Controller({
-            globalSceneOptions: {
-                triggerHook: "onLeave"
-            }
-        });
-
-        controller.scrollTo(function(pos) {
-            TweenMax.to(window, 1, {
-                scrollTo: {
-                    y: pos,
-                    autoKill: false
-                },
-                onComplete: function() {
-                    setTimeout(function() {
-                        scene.on('progress.SnapScroll', snapScroll);
-                        state.scrolling = false;
-                    }, 500);
-                }
-            });
-        });
-    }
-
-    function initAnimation() {
-        wipeAnimation = new TimelineMax();
-
-        $.each(ui.slides, function(i, slide) {
-            var nextSlideOverlay = $(slide).next().find('.p-slider__overlay');
-
-            wipeAnimation
-                .add([
-                    TweenMax.fromTo(slide, 5000, {
-                        y: '0'
-                    }, {
-                        y: '-100%',
-                        onComplete: function() {
-                            if (i < ui.slideCount - 1) { // don't run on last slide
-                                updateActiveSlide(ui.slides[i + 1]); // activate next slide
-                            }
-                        },
-                        onReverseComplete: function() {
-                            updateActiveSlide(slide);
-                        }
-                    }),
-                    TweenMax.fromTo(nextSlideOverlay, 5000, {
-                        backgroundColor: 'rgba(0, 0, 0, 1)'
-                    }, {
-                        backgroundColor: 'rgba(0, 0, 0, 0)',
-                        delay: 500
-                    })
-                ])
-        });
-    }
-
-    function initScene() {
-        scene = new ScrollMagic.Scene({
-            triggerElement: ui.el,
-            duration: '100%'
-        })
-        .setTween(wipeAnimation)
-        .setPin(ui.el, {
-            pushFollowers: false
-        })
-        .addTo(controller);
-    }
-
     function bindEvents() {
-        scene
-        .on('progress.SnapScroll', snapScroll)
-        .on('end', endSlider);
-
         ui.skipSlides.on('click.skipSlides', function(e) {
             var target = $($(this).attr('href'));
 
             e.preventDefault();
 
-            scene.off('progress.SnapScroll');
-
             $('html, body').animate({
                 scrollTop: target.offset().top
-            }, 2000, function() {
-                scene.on('progress.SnapScroll', snapScroll);                
-            });
+            }, 2000);
         });
-
-        ui.slideButtons.on('click.navigateToSlide', '.p-slider-nav__button', function(e) {
-            var slideNum = $(this).text();
-            var newPos = ($(window).height() / ui.slideCount) * slideNum;
-
-            e.preventDefault();
-
-            scene.off('progress.SnapScroll');
-            controller.scrollTo(newPos);
-        });
-    }
-
-    function snapScroll() {
-        var direction = controller.info('scrollDirection');
-        var currentIndex = $(state.currentSlide).index();
-        var newIndex = direction === 'FORWARD' ? currentIndex + 1 : currentIndex - 1;
-        var newPos = ($(window).height() / ui.slideCount) * newIndex;
-
-        if (!state.scrolling) {
-            controller.scrollTo(newPos);
-            state.scrolling = true;
-        }
     }
 
     function updateActiveSlide(slide) {
-        var slideIndex = $(slide).index();
+        state.currentSlideIndex = $(slide).index();
 
-        state.currentSlide = slide;
+        $(slide).addClass('has-displayed');
 
-        $(ui.slides).add(ui.slideButtons).removeClass('is-active');
-        $(state.currentSlide).addClass('has-displayed').add(ui.slideButtons[slideIndex]).addClass('is-active');
-
-        $.each(ui.slides, function(i, slide) { // pause and set each video back to the first frame
+        // pause and set each video back to the first frame
+        $.each(ui.slides, function(i, slide) {
             slide.video.pause();
             slide.video.currentTime = 0;
         });
@@ -230,14 +139,9 @@ var pSlider = (function(window, $, undefined) {
         }
     }
 
-    function endSlider() {
-        state.currentSlide = null;
-
-        $(ui.slides).add(ui.slideButtons).removeClass('is-active');
-    }
-
     return {
-        init: init
+        init: init,
+        ui: ui
     }
 
 })(window, jQuery);
