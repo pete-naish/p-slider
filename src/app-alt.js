@@ -73,6 +73,7 @@ var pSlider = (function(window, $, undefined) {
             new Waypoint({
                 element: slide,
                 handler: function(direction) {
+                    $(slide).addClass('active'); // add active class based on scroll to make James happy
                     // make sure class is removed on first slide
                     $(ui.el).toggleClass('reverse', direction === 'up' && i);
                 }
@@ -143,7 +144,7 @@ var pSlider = (function(window, $, undefined) {
 
             $('html, body').animate({
                 scrollTop: target.offset().top
-            }, 2000);
+            }, 750);
         });
     }
 
