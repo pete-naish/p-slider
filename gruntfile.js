@@ -24,7 +24,7 @@ module.exports = function (grunt) {
         sass: {
             development: {
                 files: {
-                    '<%= dest %>/css/app.css': '<%= src %>/sass/app.scss'
+                    '<%= dest %>/css/app-alt.css': '<%= src %>/sass/app.scss'
                 }
             }
         },
