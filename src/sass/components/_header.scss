@@ -5,10 +5,11 @@ header {
     bottom: 100%;
     transform: translateY(0);
     animation: slideInFromTop .3s 1 .5s forwards;
-    max-height: 100px;
+    height: 100px;
 
     img {
-        max-width: 100%;
+        width: 1680px;
+        height: 100px;
         display: block;
         margin: 0 auto;
     }
