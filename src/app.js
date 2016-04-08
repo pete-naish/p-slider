@@ -46,7 +46,7 @@ var pSlider = (function(window, $, undefined) {
             onActivate: function(slide) {
                 var targetSlideIndex = slide.index();
 
-                if (targetSlideIndex !== state.currentSlideIndex) {
+                if (slide.length && targetSlideIndex !== state.currentSlideIndex) {
                     updateActiveSlide(ui.slides[targetSlideIndex]);
                 }
 
@@ -60,6 +60,14 @@ var pSlider = (function(window, $, undefined) {
             offset: '100%',
             handler: function(direction) {
                 $(ui.el).toggleClass('has-ended', direction === 'down');
+            }
+        });
+
+        var headerWaypoint = new Waypoint({
+            element: $('.page-content'),
+            offset: ui.skipSlides.outerHeight() * 2,
+            handler: function(direction) {
+                $('header').toggleClass('not-fixed', direction === 'down');
             }
         });
 
