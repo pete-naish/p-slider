@@ -6,8 +6,9 @@ header {
     top: 0;
     transform: translateY(-100%);
     animation: slideInFromTop .3s 1 .5s forwards;
-    height: 100px;
-    z-index: 10;
+    height: 101px;
+    z-index: 11;
+    border-bottom: 1px solid #ecf4f6;
     img {
         width: 1680px;
         height: 100px;
@@ -15,7 +16,8 @@ header {
         margin: 0 auto;
     }
     &.not-fixed {
-        transform: translateY(0);
-        animation: slideOutToTop .3s 1 .5s forwards;
+        bottom: 60px;
+        top: auto;
+        position: absolute;
     }
 }

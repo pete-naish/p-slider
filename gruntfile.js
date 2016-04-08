@@ -48,7 +48,7 @@ module.exports = function (grunt) {
                 ]
             },
             dist: {
-                src: '<%= dest %>/css/app.css'
+                src: '<%= dest %>/css/app-alt.css'
             }
         },
 

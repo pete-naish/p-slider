@@ -63,7 +63,7 @@ var pSlider = (function(window, $, undefined) {
 
         var headerWaypoint = new Waypoint({
             element: $('.page-content'),
-            offset: ui.skipSlides.outerHeight() * 2,
+            offset: ui.skipSlides.outerHeight() + $('header').outerHeight(),
             handler: function(direction) {
                 $('header').toggleClass('not-fixed', direction === 'down');
             }
