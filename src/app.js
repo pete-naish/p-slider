@@ -1,6 +1,4 @@
 var pSlider = (function(window, $, undefined) {
-    var waypoint;
-
     var ui = {
         el: '.p-slider',
         skipSlides: null,
@@ -57,13 +55,21 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function initWaypoints() {
-        waypoint = new Waypoint({
+        var endSliderWaypoint = new Waypoint({
             element: $('.page-content'),
             offset: '100%',
             handler: function(direction) {
                 $(ui.el).toggleClass('has-ended', direction === 'down');
-                console.log('direction', direction);
             }
+        });
+
+        $.each(ui.slides, function(i, slide) {
+            new Waypoint({
+                element: slide,
+                handler: function(direction) {
+                    $(ui.el).toggleClass('reverse', direction === 'up' && i); // make sure class is removed on first slide
+                }
+            });
         });
     }
 

@@ -253,7 +253,8 @@
     top: 0;
     left: 0;
     pointer-events: none; // fix this for ie < 11
-    .active & {
+    .active &,
+    .reverse & {
         background-color: rgba(0, 0, 0, .1);
     }
 }
