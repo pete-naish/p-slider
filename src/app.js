@@ -1,4 +1,6 @@
 var pSlider = (function(window, $, undefined) {
+    var waypoint;
+
     var ui = {
         el: '.p-slider',
         skipSlides: null,
@@ -14,6 +16,7 @@ var pSlider = (function(window, $, undefined) {
     function init() {
         initUI();
         initPanelSnap();
+        initWaypoints();
         setZindexes();
         bindEvents();
     }
@@ -49,6 +52,17 @@ var pSlider = (function(window, $, undefined) {
                     updateActiveSlide(ui.slides[targetSlideIndex]);
                 }
 
+            }
+        });
+    }
+
+    function initWaypoints() {
+        waypoint = new Waypoint({
+            element: $('.page-content'),
+            offset: '100%',
+            handler: function(direction) {
+                $(ui.el).toggleClass('has-ended', direction === 'down');
+                console.log('direction', direction);
             }
         });
     }
