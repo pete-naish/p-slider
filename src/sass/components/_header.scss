@@ -7,14 +7,13 @@ header {
     transform: translateY(-100%);
     animation: slideInFromTop .3s 1 .5s forwards;
     height: 100px;
-
+    z-index: 10;
     img {
         width: 1680px;
         height: 100px;
         display: block;
         margin: 0 auto;
     }
-
     &.not-fixed {
         transform: translateY(0);
         animation: slideOutToTop .3s 1 .5s forwards;

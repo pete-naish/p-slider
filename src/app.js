@@ -15,7 +15,6 @@ var pSlider = (function(window, $, undefined) {
         initUI();
         initPanelSnap();
         initWaypoints();
-        setZindexes();
         bindEvents();
     }
 
@@ -49,7 +48,6 @@ var pSlider = (function(window, $, undefined) {
                 if (slide.length && targetSlideIndex !== state.currentSlideIndex) {
                     updateActiveSlide(ui.slides[targetSlideIndex]);
                 }
-
             }
         });
     }
@@ -75,15 +73,11 @@ var pSlider = (function(window, $, undefined) {
             new Waypoint({
                 element: slide,
                 handler: function(direction) {
-                    $(ui.el).toggleClass('reverse', direction === 'up' && i); // make sure class is removed on first slide
+                    // make sure class is removed on first slide
+                    $(ui.el).toggleClass('reverse', direction === 'up' && i);
                 }
             });
         });
-    }
-
-    function setZindexes() {
-        $(ui.sliderNav).add(ui.skipSlides).css('z-index', ui.slideCount + 1);
-        $('header').css('z-index', ui.slideCount + 2);
     }
 
     function buildSlideButtons(i, slide) {
@@ -131,7 +125,9 @@ var pSlider = (function(window, $, undefined) {
                 video.play();
             }
 
-            $(video).off('canplaythrough').parent().addClass('has-loaded'); // unbind this after first run, as restarting video (in playVideo func) causes the canplaythrough event to be fired every time the slide is viewed
+            // unbind this after first run, as restarting video (in playVideo func)
+            // causes the canplaythrough event to be fired every time the slide is viewed
+            $(video).off('canplaythrough').parent().addClass('has-loaded');
         })
         .on('error', function(e) {
             video.load();
@@ -152,9 +148,7 @@ var pSlider = (function(window, $, undefined) {
     }
 
     function updateActiveSlide(slide) {
-        state.currentSlideIndex = $(slide).index();
-
-        $(slide).addClass('has-displayed');
+        state.currentSlideIndex = $(slide).addClass('has-displayed').index();
 
         // pause and set each video back to the first frame
         $.each(ui.slides, function(i, slide) {
@@ -168,8 +162,7 @@ var pSlider = (function(window, $, undefined) {
     }
 
     return {
-        init: init,
-        ui: ui
+        init: init
     }
 
 })(window, jQuery);
