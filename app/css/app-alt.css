@@ -109,7 +109,7 @@ header {
 
 .p-slider__title {
   transition: all .3s ease-out;
-  font-family: "VWHeadBold" Arial, sans-serif;
+  font-family: "VWHeadBold", Arial, sans-serif;
   font-size: 60px;
   color: #fff;
   margin: 0 0 2px 0;
@@ -123,7 +123,7 @@ header {
 
 .p-slider__subtitle {
   transition: all .3s ease-out;
-  font-family: "VWHeadBold" Arial, sans-serif;
+  font-family: "VWHeadBold", Arial, sans-serif;
   font-size: 30px;
   color: #fff;
   margin: 0 0 25px 0;
@@ -137,7 +137,7 @@ header {
 
 .p-slider__button {
   transition: background-color .2s linear, opacity .3s ease-out .3s;
-  font-family: "VWHeadBold" Arial, sans-serif;
+  font-family: "VWHeadBold", Arial, sans-serif;
   font-size: 14px;
   background-color: #01a8ec;
   color: #fff;
@@ -184,7 +184,7 @@ header {
     transition-delay: .6s; }
 
 .p-slider__cta {
-  font-family: "VWHeadBold" Arial, sans-serif;
+  font-family: "VWHeadBold", Arial, sans-serif;
   color: #fff;
   font-size: 20px;
   text-decoration: none;
