@@ -9,7 +9,19 @@ var pSlider = (function(window, $, undefined) {
 
     var state = {
         currentSlideIndex: null,
-        auto: true
+        auto: true,
+        timerRunning: false,
+        timeout: 30000
+    }
+
+    function activateAutoTimer() {
+        return setTimeout(function() {
+            state.auto = true;
+            state.timerRunning = false;
+
+            goToNextSlide();
+            console.log('set to true');
+        }, state.timeout);
     }
 
     function init() {
@@ -50,7 +62,7 @@ var pSlider = (function(window, $, undefined) {
             onActivate: function(slide) {
                 var targetSlideIndex = slide.index();
 
-                if (slide.length && targetSlideIndex !== state.currentSlideIndex && state.currentSlideIndex < ui.slideCount) {
+                if (slide.length && targetSlideIndex !== state.currentSlideIndex) {
                     updateActiveSlide(ui.slides[targetSlideIndex]);
                 }
             }
@@ -77,9 +89,9 @@ var pSlider = (function(window, $, undefined) {
         $.each(ui.slides, function(i, slide) {
             new Waypoint({
                 element: slide,
-                // offset: '50%',
+                offset: '50%',
                 handler: function(direction) {
-                    $(slide).addClass('active'); // add active class based on scroll to make James happy
+                    $(slide).addClass('active');
                 }
             });
 
@@ -137,11 +149,16 @@ var pSlider = (function(window, $, undefined) {
                 video.play();
             }
 
-            console.log(video.duration);
-
             // unbind this after first run, as restarting video (in playVideo func)
             // causes the canplaythrough event to be fired every time the slide is viewed
             $(video).off('canplaythrough').parent().addClass('has-loaded');
+        })
+        .on('timeupdate', function() {
+            var currentPos = video.currentTime;
+            var duration = video.duration;
+            var percentage = 100 * currentPos / duration;
+
+            // console.log(percentage);
         })
         .on('ended', function() {
             if (state.auto) {
@@ -163,6 +180,20 @@ var pSlider = (function(window, $, undefined) {
             $('html, body').animate({
                 scrollTop: target.offset().top
             }, 750);
+        });
+
+        $('.p-slider__button, .p-slider__cta, .p-slider-nav__button').on('click.resetTimer', function() {
+            state.auto = false;
+
+            clearTimeout(activateAutoTimer);
+
+            if (!state.timerRunning) {
+                activateAutoTimer();
+                state.timerRunning = true;
+                console.log('can start timer');
+            }
+
+            console.log('timeout cleared');
         });
     }
 
