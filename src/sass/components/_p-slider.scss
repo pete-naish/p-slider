@@ -41,6 +41,9 @@
     top: 42%;
     transform: translate(-50%, -50%);
     text-align: center;
+    * {
+        -webkit-font-smoothing: antialiased;
+    }
 }
 
 .p-slider__content--alt {
@@ -142,6 +145,7 @@
     text-decoration: none;
     padding: 7px 0 7px 52px;
     background: url(/src/img/bg-encircled-arrow--white.png) no-repeat left center;
+    -webkit-font-smoothing: antialiased;
     &:hover {
         text-decoration: underline;
     }
@@ -190,7 +194,7 @@
     }
     .has-ended & {
         position: absolute;
-        bottom: 18.5%;
+        bottom: 18.7%;
     }
 }
 
