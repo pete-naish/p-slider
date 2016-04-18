@@ -8,7 +8,8 @@ var pSlider = (function(window, $, undefined) {
     };
 
     var state = {
-        currentSlideIndex: null
+        currentSlideIndex: null,
+        auto: true
     }
 
     function init() {
@@ -40,12 +41,16 @@ var pSlider = (function(window, $, undefined) {
                 keys: {
                     nextKey: 40,
                     prevKey: 38
-                }
+                },
+                buttons: {
+                    $nextButton: $('.p-slider__next-slide')
+                },
+                wrapAround: true
             },
             onActivate: function(slide) {
                 var targetSlideIndex = slide.index();
 
-                if (slide.length && targetSlideIndex !== state.currentSlideIndex) {
+                if (slide.length && targetSlideIndex !== state.currentSlideIndex && state.currentSlideIndex < ui.slideCount) {
                     updateActiveSlide(ui.slides[targetSlideIndex]);
                 }
             }
@@ -72,10 +77,9 @@ var pSlider = (function(window, $, undefined) {
         $.each(ui.slides, function(i, slide) {
             new Waypoint({
                 element: slide,
-                offset: '50%',
+                // offset: '50%',
                 handler: function(direction) {
                     $(slide).addClass('active'); // add active class based on scroll to make James happy
-                    // make sure class is removed on first slide
                 }
             });
 
@@ -133,9 +137,16 @@ var pSlider = (function(window, $, undefined) {
                 video.play();
             }
 
+            console.log(video.duration);
+
             // unbind this after first run, as restarting video (in playVideo func)
             // causes the canplaythrough event to be fired every time the slide is viewed
             $(video).off('canplaythrough').parent().addClass('has-loaded');
+        })
+        .on('ended', function() {
+            if (state.auto) {
+                goToNextSlide();
+            }
         })
         .on('error', function(e) {
             video.load();
@@ -155,6 +166,10 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
+    function goToNextSlide() {
+        $('.p-slider__next-slide').trigger('click');
+    }
+
     function updateActiveSlide(slide) {
         state.currentSlideIndex = $(slide).addClass('has-displayed').index();
 
@@ -170,7 +185,8 @@ var pSlider = (function(window, $, undefined) {
     }
 
     return {
-        init: init
+        init: init,
+        ui: ui
     }
 
 })(window, jQuery);
