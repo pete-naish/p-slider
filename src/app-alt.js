@@ -9,7 +9,7 @@ var pSlider = (function(window, $, undefined) {
 
     var state = {
         currentSlideIndex: null,
-        auto: true,
+        auto: false,
         timerRunning: false,
         timeout: 30000
     }
@@ -201,15 +201,15 @@ var pSlider = (function(window, $, undefined) {
             // console.log(percentage);
         })
         .on('ended', function() {
-            setAnimationDuration($('.p-slider-nav__button.active'), 0);
+            // setAnimationDuration($('.p-slider-nav__button.active'), 0);
 
             if (state.auto) {
                 goToNextSlide();
             }
         })
         .on('error', function(e) {
-            video.load();
-            video.play();
+            // video.load();
+            // video.play();
         });
     }
 
@@ -272,6 +272,8 @@ var pSlider = (function(window, $, undefined) {
 
     function updateActiveSlide(slide) {
         state.currentSlideIndex = $(slide).addClass('has-displayed').index();
+
+        setAnimationDuration($('.p-slider-nav__button'), 0);
 
         // pause and set each video back to the first frame
         $.each(ui.slides, function(i, slide) {
