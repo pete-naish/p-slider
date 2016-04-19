@@ -9,7 +9,7 @@ var pSlider = (function(window, $, undefined) {
 
     var state = {
         currentSlideIndex: null,
-        auto: true,
+        auto: false,
         timerRunning: false,
         timeout: 30000
     }
@@ -41,6 +41,11 @@ var pSlider = (function(window, $, undefined) {
             $(slide).attr('data-panel', i);
             buildSlideButtons(i, slide);
             initVideos(i, slide);
+        })
+        .promise()
+        .done(function() {
+            // fix jquery's inability to render svg
+            ui.sliderNav.html(ui.sliderNav.html());
         });
     }
 
@@ -112,7 +117,34 @@ var pSlider = (function(window, $, undefined) {
             class: 'p-slider-nav__button',
             text: i,
             'data-panel': i
-        }))
+        })
+            .append($('<svg>', {
+                class: 'p-slider-nav__progress',
+                xmlns: 'http://www.w3.org/2000/svg',
+                width: 30,
+                height: 30,
+                viewBox: '0 0 30 30',
+                version: '1.1'
+            })
+                .append($('<circle>', {
+                    r: 13.5,
+                    cx: 15,
+                    cy: 15,
+                    fill: 'transparent',
+                    'stroke-dasharray': '85',
+                    'stroke-dashoffset': 0
+                }))
+                .append($('<circle>', {
+                    class: 'p-slider-nav__progress-bar',
+                    r: 13.5,
+                    cx: 15,
+                    cy: 15,
+                    fill: 'transparent',
+                    'stroke-dasharray': '85',
+                    'stroke-dashoffset': 0
+                }))
+            )
+        )
         .appendTo(ui.sliderNav);
     }
 
@@ -154,9 +186,14 @@ var pSlider = (function(window, $, undefined) {
             $(video).off('canplaythrough').parent().addClass('has-loaded');
         })
         .on('timeupdate', function() {
+            console.log('update');
             var currentPos = video.currentTime;
             var duration = video.duration;
             var percentage = 100 * currentPos / duration;
+
+            console.log(percentage);
+
+            // updateSlideProgress(percentage, $('.p-slider-nav__button.active'));
 
             // console.log(percentage);
         })
@@ -183,17 +220,40 @@ var pSlider = (function(window, $, undefined) {
         });
 
         $('.p-slider__button, .p-slider__cta, .p-slider-nav__button').on('click.resetTimer', function() {
-            state.auto = false;
+            // state.auto = false;
 
-            clearTimeout(activateAutoTimer);
+            // clearTimeout(activateAutoTimer);
 
-            if (!state.timerRunning) {
-                activateAutoTimer();
-                state.timerRunning = true;
-                console.log('can start timer');
-            }
+            // if (!state.timerRunning) {
+            //     activateAutoTimer();
+            //     state.timerRunning = true;
+            //     console.log('can start timer');
+            // }
 
-            console.log('timeout cleared');
+            // console.log('timeout cleared');
+        });
+    }
+
+    function updateSlideProgress(val, $el) {
+        var $circle = $el.find('.p-slider-nav__progress-bar');
+        var r = $circle.attr('r');
+        var c = Math.PI * (r * 2);
+        var pct;
+
+        if (val < 0) {
+            val = 0;
+        } else if (val > 100) {
+            val = 100;
+        }
+        
+        pct = ((100 - val) / 100) * c;
+
+        console.log($circle);
+        console.log('pct', pct);
+
+
+        $circle.css({
+            'stroke-dashoffset': pct
         });
     }
 
@@ -206,8 +266,10 @@ var pSlider = (function(window, $, undefined) {
 
         // pause and set each video back to the first frame
         $.each(ui.slides, function(i, slide) {
-            slide.video.pause();
-            slide.video.currentTime = 0;
+            if (slide.video) {
+                slide.video.pause();
+                slide.video.currentTime = 0;
+            }
         });
 
         if (slide.video && slide.video.hasLoaded) {
