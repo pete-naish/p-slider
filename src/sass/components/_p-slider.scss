@@ -241,16 +241,23 @@
     position: absolute;
     left: 4.5px;
     top: 0;
+    transform: rotate(-90deg);
     circle {
-        stroke-dashoffset: 0;
-        transition: stroke-dashoffset .1s linear;
+        transition-property: stroke-dashoffset;
+        transition-timing-function: linear;
+        transition-duration: 0;
         stroke: #00a8ec;
         opacity: .3;
         stroke-width: 3px;
     }
     .p-slider-nav__progress-bar {
+        stroke-dashoffset: 85;
         stroke: #00a8ec;
         opacity: 1;
+        .active & {
+            // transition-duration: 10s;
+            stroke-dashoffset: 0;            
+        }
     }
     .active & {
         transition: opacity .1s linear;

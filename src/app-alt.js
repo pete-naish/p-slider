@@ -9,7 +9,7 @@ var pSlider = (function(window, $, undefined) {
 
     var state = {
         currentSlideIndex: null,
-        auto: false,
+        auto: true,
         timerRunning: false,
         timeout: 30000
     }
@@ -131,7 +131,7 @@ var pSlider = (function(window, $, undefined) {
                     cx: 15,
                     cy: 15,
                     fill: 'transparent',
-                    'stroke-dasharray': '85',
+                    'stroke-dasharray': 85,
                     'stroke-dashoffset': 0
                 }))
                 .append($('<circle>', {
@@ -140,8 +140,8 @@ var pSlider = (function(window, $, undefined) {
                     cx: 15,
                     cy: 15,
                     fill: 'transparent',
-                    'stroke-dasharray': '85',
-                    'stroke-dashoffset': 0
+                    'stroke-dasharray': 85,
+                    'stroke-dashoffset': 85
                 }))
             )
         )
@@ -185,19 +185,24 @@ var pSlider = (function(window, $, undefined) {
             // causes the canplaythrough event to be fired every time the slide is viewed
             $(video).off('canplaythrough').parent().addClass('has-loaded');
         })
+        .on('play', function() {
+            setAnimationDuration($('.p-slider-nav__button.active'), video.duration);
+        })
         .on('timeupdate', function() {
-            console.log('update');
+            // console.log('update');
             var currentPos = video.currentTime;
             var duration = video.duration;
             var percentage = 100 * currentPos / duration;
 
-            console.log(percentage);
+            // console.log(percentage);
 
             // updateSlideProgress(percentage, $('.p-slider-nav__button.active'));
 
             // console.log(percentage);
         })
         .on('ended', function() {
+            setAnimationDuration($('.p-slider-nav__button'), 0);
+
             if (state.auto) {
                 goToNextSlide();
             }
@@ -234,6 +239,14 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
+    function setAnimationDuration($el, val) {
+        var $circle = $el.find('.p-slider-nav__progress-bar');
+
+        $circle.css({
+            'transition-duration': val + 's'
+        });
+    }
+
     function updateSlideProgress(val, $el) {
         var $circle = $el.find('.p-slider-nav__progress-bar');
         var r = $circle.attr('r');
@@ -247,10 +260,6 @@ var pSlider = (function(window, $, undefined) {
         }
         
         pct = ((100 - val) / 100) * c;
-
-        console.log($circle);
-        console.log('pct', pct);
-
 
         $circle.css({
             'stroke-dashoffset': pct
