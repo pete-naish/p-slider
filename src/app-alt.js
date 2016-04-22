@@ -1,4 +1,6 @@
 var pSlider = (function(window, $, undefined) {
+    'use-strict';
+
     var ui = {
         el: '.p-slider',
         skipSlides: null,
@@ -9,18 +11,20 @@ var pSlider = (function(window, $, undefined) {
 
     var state = {
         currentSlideIndex: null,
-        auto: false,
-        timerRunning: false,
+        auto: true,
+        timer: undefined,
         timeout: 30000
-    }
+    };
 
     function activateAutoTimer() {
-        return setTimeout(function() {
-            state.auto = true;
-            state.timerRunning = false;
+        state.timer = setTimeout(function() {
+            var currentVideo = ui.slides[state.currentSlideIndex].video;
 
-            goToNextSlide();
-            console.log('set to true');
+            state.auto = true;
+
+            if (currentVideo && currentVideo.ended || !currentVideo) {
+                goToNextSlide();
+            }
         }, state.timeout);
     }
 
@@ -34,7 +38,7 @@ var pSlider = (function(window, $, undefined) {
     function initUI() {
         ui.slides = $(ui.el).find('.p-slider__slide');
         ui.slideCount = ui.slides.length;
-        ui.sliderNav = $(ui.el).find('.p-slider-nav');
+        ui.sliderNav = $('<ul class="p-slider-nav">');
         ui.skipSlides = $(ui.el).find('.p-slider__skip-slides');
 
         $.each(ui.slides, function(i, slide) {
@@ -44,6 +48,8 @@ var pSlider = (function(window, $, undefined) {
         })
         .promise()
         .done(function() {
+            $(ui.el).append(ui.sliderNav);
+            
             // fix jquery's inability to render svg
             ui.sliderNav.html(ui.sliderNav.html());
         });
@@ -189,16 +195,11 @@ var pSlider = (function(window, $, undefined) {
             setAnimationDuration($('.p-slider-nav__button.active'), video.duration);
         })
         .on('timeupdate', function() {
-            // console.log('update');
             var currentPos = video.currentTime;
             var duration = video.duration;
             var percentage = 100 * currentPos / duration;
 
-            // console.log(percentage);
-
             // updateSlideProgress(percentage, $('.p-slider-nav__button.active'));
-
-            // console.log(percentage);
         })
         .on('ended', function() {
             // setAnimationDuration($('.p-slider-nav__button.active'), 0);
@@ -208,8 +209,8 @@ var pSlider = (function(window, $, undefined) {
             }
         })
         .on('error', function(e) {
-            // video.load();
-            // video.play();
+            video.load();
+            video.play();
         });
     }
 
@@ -225,17 +226,14 @@ var pSlider = (function(window, $, undefined) {
         });
 
         $('.p-slider__button, .p-slider__cta, .p-slider-nav__button').on('click.resetTimer', function() {
-            // state.auto = false;
+            state.auto = false;
 
-            // clearTimeout(activateAutoTimer);
+            if (state.timer) {
+                clearTimeout(state.timer); 
+                state.timer = undefined;
+            }
 
-            // if (!state.timerRunning) {
-            //     activateAutoTimer();
-            //     state.timerRunning = true;
-            //     console.log('can start timer');
-            // }
-
-            // console.log('timeout cleared');
+            activateAutoTimer();
         });
     }
 
@@ -291,7 +289,7 @@ var pSlider = (function(window, $, undefined) {
     return {
         init: init,
         ui: ui
-    }
+    };
 
 })(window, jQuery);
 
