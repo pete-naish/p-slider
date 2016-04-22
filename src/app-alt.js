@@ -16,18 +16,6 @@ var pSlider = (function(window, $, undefined) {
         timeout: 30000
     };
 
-    function activateAutoTimer() {
-        state.timer = setTimeout(function() {
-            var currentVideo = ui.slides[state.currentSlideIndex].video;
-
-            state.auto = true;
-
-            if (currentVideo && currentVideo.ended || !currentVideo) {
-                goToNextSlide();
-            }
-        }, state.timeout);
-    }
-
     function init() {
         initUI();
         initPanelSnap();
@@ -185,25 +173,14 @@ var pSlider = (function(window, $, undefined) {
 
             if (playFirstSlide) {
                 video.play();
+                setAnimationDuration($('.p-slider-nav__button.active'), video.duration);
             }
 
             // unbind this after first run, as restarting video (in playVideo func)
             // causes the canplaythrough event to be fired every time the slide is viewed
             $(video).off('canplaythrough').parent().addClass('has-loaded');
         })
-        .on('play', function() {
-            setAnimationDuration($('.p-slider-nav__button.active'), video.duration);
-        })
-        .on('timeupdate', function() {
-            var currentPos = video.currentTime;
-            var duration = video.duration;
-            var percentage = 100 * currentPos / duration;
-
-            // updateSlideProgress(percentage, $('.p-slider-nav__button.active'));
-        })
         .on('ended', function() {
-            // setAnimationDuration($('.p-slider-nav__button.active'), 0);
-
             if (state.auto) {
                 goToNextSlide();
             }
@@ -237,7 +214,20 @@ var pSlider = (function(window, $, undefined) {
         });
     }
 
+    function activateAutoTimer() {
+        state.timer = setTimeout(function() {
+            var currentVideo = ui.slides[state.currentSlideIndex].video;
+
+            state.auto = true;
+
+            if (currentVideo && currentVideo.ended || !currentVideo) {
+                goToNextSlide();
+            }
+        }, state.timeout);
+    }
+
     function setAnimationDuration($el, val) {
+        console.log(val);
         var $circle = $el.find('.p-slider-nav__progress-bar');
 
         $circle.css({
@@ -282,6 +272,7 @@ var pSlider = (function(window, $, undefined) {
         });
 
         if (slide.video && slide.video.hasLoaded) {
+            setAnimationDuration($('.p-slider-nav__button.active'), slide.video.duration);
             slide.video.play();
         }
     }
