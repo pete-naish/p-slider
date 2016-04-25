@@ -177,7 +177,7 @@
         transition: all .2s linear;
         background-position: center top;
     }
-    .has-ended & {
+    .on-last-slide & {
         position: absolute;
     }
 }
@@ -193,7 +193,7 @@
     .is-loading & {
         display: none;
     }
-    .has-ended & {
+    .on-last-slide & {
         position: absolute;
         bottom: 18.7%;
     }
