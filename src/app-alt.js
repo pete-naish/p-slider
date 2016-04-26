@@ -9,11 +9,15 @@ var pSlider = (function(window, $, undefined) {
         sliderNav: null
     };
 
+    var settings = {
+        timeout: 30000,
+        slideDuration: 10
+    }
+
     var state = {
         currentSlideIndex: null,
         auto: true,
-        timer: undefined,
-        timeout: 30000
+        timer: undefined
     };
 
     function init() {
@@ -59,10 +63,10 @@ var pSlider = (function(window, $, undefined) {
                 wrapAround: true
             },
             onActivate: function(slide) {
-                var targetSlideIndex = slide.index();
+                var slideIndex = slide.index();
 
-                if (slide.length && targetSlideIndex !== state.currentSlideIndex) {
-                    updateActiveSlide(ui.slides[targetSlideIndex]);
+                if (slide.length && slideIndex !== state.currentSlideIndex) {
+                    updateActiveSlide(ui.slides[slideIndex]);
                 }
             }
         });
@@ -93,7 +97,6 @@ var pSlider = (function(window, $, undefined) {
                 $('header').toggleClass('not-fixed', direction === 'down');
 
                 if (direction === 'up') {
-                    // console.log($(ui.sliderNav).find('[data-panel="'+ state.currentSlideIndex +'"]'));
                     $(ui.sliderNav).find('[data-panel="'+ state.currentSlideIndex +'"]').trigger('click');
                 }
             }
@@ -229,11 +232,10 @@ var pSlider = (function(window, $, undefined) {
             if ((currentVideo && currentVideo.ended) || !currentVideo) {
                 goToNextSlide();
             }
-        }, state.timeout);
+        }, settings.timeout);
     }
 
     function resetAutoTimer() {
-        console.log('called');
         state.auto = false;
 
         if (state.timer) {
@@ -252,25 +254,6 @@ var pSlider = (function(window, $, undefined) {
             'transition-duration': val + 's'
         });
     }
-
-    // function updateSlideProgress(val, $el) {
-    //     var $circle = $el.find('.p-slider-nav__progress-bar');
-    //     var r = $circle.attr('r');
-    //     var c = Math.PI * (r * 2);
-    //     var pct;
-
-    //     if (val < 0) {
-    //         val = 0;
-    //     } else if (val > 100) {
-    //         val = 100;
-    //     }
-        
-    //     pct = ((100 - val) / 100) * c;
-
-    //     $circle.css({
-    //         'stroke-dashoffset': pct
-    //     });
-    // }
 
     function goToNextSlide() {
         if (!$(ui.el).hasClass('has-ended')) {
@@ -294,6 +277,15 @@ var pSlider = (function(window, $, undefined) {
         if (slide.video && slide.video.hasLoaded) {
             setAnimationDuration($('.p-slider-nav__button.active'), slide.video.duration);
             slide.video.play();
+        } else if (!slide.video) {
+            console.log('slide has no video');
+            setAnimationDuration($('.p-slider-nav__button.active'), settings.slideDuration);
+
+            setTimeout(function() {
+                if (state.auto) {
+                    goToNextSlide();
+                }
+            }, settings.slideDuration * 1000)
         }
     }
 
