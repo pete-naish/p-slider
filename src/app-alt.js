@@ -10,14 +10,16 @@ var pSlider = (function(window, $, undefined) {
     };
 
     var settings = {
-        timeout: 30000,
-        slideDuration: 10
+        idleTimeout: 30000,
+        slideDuration: 10,
+        interactionDisablesAuto: false
     }
 
     var state = {
         currentSlideIndex: null,
         auto: true,
-        timer: undefined
+        idleTimer: undefined,
+        imageTimer: undefined
     };
 
     function init() {
@@ -87,6 +89,9 @@ var pSlider = (function(window, $, undefined) {
             handler: function(direction) {
                 $(ui.el).toggleClass('has-ended', direction === 'down');
 
+                if (direction === 'down') {
+                    ui.skipSlides.trigger('click.skipSlides');
+                }
             }
         });
 
@@ -219,12 +224,14 @@ var pSlider = (function(window, $, undefined) {
             }, 750);
         });
 
-        $('.p-slider__button, .p-slider__cta, .p-slider-nav__button').on('click.resetTimer', resetAutoTimer);
-        $(window).on('mousewheel.resetTimer', resetAutoTimer);
+        if (settings.interactionDisablesAuto) {
+            $('.p-slider__button, .p-slider__cta, .p-slider-nav__button').on('click.resetIdleTimer', resetIdleTimer);
+            $(window).on('mousewheel.resetIdleTimer', resetIdleTimer);
+        }
     }
 
-    function activateAutoTimer() {
-        state.timer = setTimeout(function() {
+    function activateIdleTimer() {
+        state.idleTimer = setTimeout(function() {
             var currentVideo = ui.slides[state.currentSlideIndex].video;
 
             state.auto = true;
@@ -232,18 +239,18 @@ var pSlider = (function(window, $, undefined) {
             if ((currentVideo && currentVideo.ended) || !currentVideo) {
                 goToNextSlide();
             }
-        }, settings.timeout);
+        }, settings.idleTimeout);
     }
 
-    function resetAutoTimer() {
+    function resetIdleTimer() {
         state.auto = false;
 
-        if (state.timer) {
-            clearTimeout(state.timer); 
-            state.timer = undefined;
+        if (state.idleTimer) {
+            clearTimeout(state.idleTimer); 
+            state.idleTimer = undefined;
         }
 
-        activateAutoTimer();
+        activateIdleTimer();
     }
 
     function setAnimationDuration($el, val) {
@@ -266,6 +273,11 @@ var pSlider = (function(window, $, undefined) {
 
         setAnimationDuration($('.p-slider-nav__button'), 0);
 
+        if (state.imageSlideTimer) {
+            clearTimeout(state.imageSlideTimer); 
+            state.imageSlideTimer = undefined;
+        }
+
         // pause and set each video back to the first frame
         $.each(ui.slides, function(i, slide) {
             if (slide.video) {
@@ -275,13 +287,16 @@ var pSlider = (function(window, $, undefined) {
         });
 
         if (slide.video && slide.video.hasLoaded) {
+            
             setAnimationDuration($('.p-slider-nav__button.active'), slide.video.duration);
             slide.video.play();
+
         } else if (!slide.video) {
+            
             console.log('slide has no video');
             setAnimationDuration($('.p-slider-nav__button.active'), settings.slideDuration);
 
-            setTimeout(function() {
+            state.imageSlideTimer = setTimeout(function() {
                 if (state.auto) {
                     goToNextSlide();
                 }
